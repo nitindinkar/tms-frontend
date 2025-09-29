@@ -1,0 +1,279 @@
+
+a {
+  transition: background 0.2s, color 0.2s;
+}
+a:hover,
+a:focus {
+  text-decoration: none;
+}
+
+#wrapper {
+  padding-left: 0;
+  transition: all 0.5s ease;
+  position: relative;
+}
+
+#sidebar-wrapper {
+  z-index: 1000;
+  position: fixed;
+  left: 250px;
+  width: 0;
+  height: 100%;
+  margin-left: -250px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: var(--primarycolor);
+  background-image: linear-gradient(180deg, #0a266c 10%, #234fbf 100%);
+  transition: all 0.5s ease;
+}
+
+#wrapper.toggled #sidebar-wrapper {
+  width: 250px;
+}
+
+.sidebar-brand {
+  position: relative;
+  top: 0;
+  width: 100%;
+  text-align: center;
+  padding: 10px 10px;
+}
+.sidebar-brand h2 {
+  margin: 0;
+  font-weight: 600;
+  font-size: 24px;
+  color: #fff;
+}
+
+.sidebar-nav {
+  position: relative;
+  top:0;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sidebar-nav > li {
+  text-indent: 10px;
+  line-height: 42px;
+
+}
+.sidebar-nav > li a {
+  display: block;
+  text-decoration: none;
+  color: #ffffff;
+  font-weight: 400;
+  font-size: 16px;
+  padding: 0px 10px;
+  border-radius: 0px;
+  text-align: left;
+    line-height: 42px;
+}
+.toggled .sidebar-nav > li a{
+  padding: 0 0px;
+}
+.sidebar-nav > li > a:hover,
+.sidebar-nav > li.active > a {
+  text-decoration: none;
+  color: #ffffff;
+  background: var(--lighbgcolor);
+
+}
+.sidebar-nav > li > a:hover,
+.sidebar-nav > li.active > a {
+  text-decoration: none;
+  color: #ffffff;
+  background: var(--lighbgcolor);
+
+}
+.sidebar-nav > li > a i.fa {
+  font-size: 24px;
+  width: 60px;
+}
+.btn-toggle-nav{
+  padding: 0px 20px;
+}
+.btn-toggle-nav li a{
+  color: #ffffff !important;
+}
+.btn-toggle-nav li a:hover, .btn-toggle-nav li.active > a{
+  color: #ffffff !important;
+  background: var(--lighbgcolor);
+}
+#navbar-wrapper {
+    width: 100%;
+    position: absolute;
+    z-index: 2;
+}
+#wrapper.toggled #navbar-wrapper {
+    position: absolute;
+    margin-right: -250px;
+}
+#navbar-wrapper .navbar {
+  border-width: 0 0 0 0;
+  background-color: #0a266c;
+  background-image: linear-gradient(180deg, #0a266c 10%, #234fbf 100%);
+  font-size: 24px;
+  margin-bottom: 0;
+  border-radius: 0;
+}
+#navbar-wrapper .navbar a {
+  color: #ffffff;
+}
+#navbar-wrapper .navbar a:hover {
+  color: #F8BE12;
+}
+
+
+.toggled .sidebar-nav span{
+  display: none;
+} 
+.sidebar-logo{
+  width: 90%;
+  height: 78px;
+  background: url('../../assets/Logo-MOSPI-sidebar.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  display: block;
+}
+
+#wrapper.toggled .sidebar-logo{
+  width: 90%;
+  height: 78px;
+  background: url('../../assets/ashokstamp.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  display: block;
+}
+
+.arrow{
+  transition: transform .35s ease;
+  transform-origin: .5em 50%;
+  width: 1rem;
+text-align: center;
+float: right;
+margin-top: 13px;
+}
+
+.btn-toggle[aria-expanded="true"] > .arrow {
+  transform: rotate(90deg);
+}
+
+
+.sidebar-divider{
+  border-top: 1px solid rgba(255, 255, 255, 0.55);
+  margin: 0rem 0rem !important;
+}
+
+#wrapper.toggled .btn-toggle-nav{
+  padding: 0px 11px;
+}
+
+
+@media (min-width: 992px) {
+  #wrapper {
+    padding-left: 250px;
+  }
+  
+  #wrapper.toggled {
+    padding-left: 60px;
+  }
+
+  #sidebar-wrapper {
+    width: 250px;
+  }
+  
+  #wrapper.toggled #sidebar-wrapper {
+    width: 60px;
+  }
+  
+  #wrapper.toggled #navbar-wrapper {
+    position: absolute;
+    margin-right: -190px;
+}
+  
+
+
+  #navbar-wrapper {
+    position: relative;
+  }
+
+  #wrapper.toggled {
+    padding-left: 60px;
+  }
+
+
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  #wrapper {
+    padding-left: 60px;
+  }
+
+  #sidebar-wrapper {
+    width: 60px;
+  }
+  
+#wrapper.toggled #navbar-wrapper {
+    position: absolute;
+    margin-right: -250px;
+}
+  
+
+  #navbar-wrapper {
+    position: relative;
+  }
+
+  #wrapper.toggled {
+    padding-left: 250px;
+  }
+
+
+
+
+}
+
+@media (max-width: 767px) {
+  #wrapper {
+    padding-left: 0;
+  }
+
+  #sidebar-wrapper {
+    width: 0;
+  }
+
+  #wrapper.toggled #sidebar-wrapper {
+    width: 250px;
+  }
+  #wrapper.toggled #navbar-wrapper {
+    position: absolute;
+    margin-right: -250px;
+  }
+
+
+
+  #navbar-wrapper {
+    position: relative;
+  }
+
+  #wrapper.toggled {
+    padding-left: 250px;
+  }
+
+  .toggled .sidebar-nav span {
+    display: inline-block;
+}
+  #wrapper.toggled .sidebar-logo{
+    width: 90%;
+    height: 78px;
+    background: url('../../assets/Logo-MOSPI-sidebar.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    display: block;
+  }
+
+}
+

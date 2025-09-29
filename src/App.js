@@ -1,24 +1,38 @@
-import logo from './logo.svg';
+import React, { Suspense, useContext } from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle';
 import './App.css';
 
+const Layout =  React.lazy(() => import('./Pages/layout/index'));
+const Login =  React.lazy(() => import('./Pages/login/index'));
+const BeneficiaryIdentification =  React.lazy(() => import('./Pages/beneficiaryIdentification/index'));
+const isAuthenticated = () => {
+  // Replace this with real authentication check logic
+ // return Cookies.get('isAuthenticated') === "true";
+ return true;
+};
+const PrivateRoute = ({ element, path }) => {
+  return isAuthenticated() ? element : <Navigate to="/" />;
+};
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Suspense fallback={<div>Loading...</div>}>
+        <Routes>
+          {/* <Route path="/" element={<Dashboard />} /> */}
+          <Route path="/" element={<Login />} />
+          
+          {/* Admin routes */}
+          <Route path="/" element={<PrivateRoute element={<Layout />} />}>
+          <Route path="beneficiary-identification" element={<BeneficiaryIdentification />} />
+
+
+            
+          </Route>
+        </Routes>
+      </Suspense>
+    </Router>
   );
 }
 
