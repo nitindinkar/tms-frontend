@@ -1,9 +1,9 @@
 import React from 'react';
 import { useState } from 'react';
-import GenerateTidModal from '../../components/GenerateTidModal';
-import SuccessModal from '../../components/SuccessModal';
-import StatsCards from '../../components/StatsCards';
-import TIDListing from '../../components/TIDListing';
+import GenerateTidModal from '../../components/BisComponent/GenerateTidModal';
+import SuccessModal from '../../components/BisComponent/SuccessModal';
+import StatsCards from '../../components/BisComponent/StatsCards';
+import TIDListing from '../../components/BisComponent/TIDListing';
 import "bootstrap/dist/css/bootstrap.min.css";
 
 

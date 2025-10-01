@@ -299,6 +299,9 @@ body {
 .card-total {
     background: linear-gradient(45deg, #2196f3, #3f51b5);
 }
+.card-queries {
+    background: linear-gradient(135deg, #ff9800, #ffc107); 
+}
 
 /* Buttons */
 .btn-success {
@@ -727,6 +730,14 @@ body {
     opacity: 0.5;
   }
   
+  .btn-customeclose{
+    background: var(--dark-grey) !important;
+    color: var(--light-bg) !important;
+    --bs-btn-close-bg:none !important;
+    width: 4.5rem !important;
+    height: 1.875rem !important;
+  }
+
 /* Disabled state for buttons */
   .btn-outline-secondary:disabled {
     opacity: 0.6;
