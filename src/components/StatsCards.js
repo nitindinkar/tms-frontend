@@ -2,8 +2,8 @@ import React from 'react';
 
 const StatsCards = () => {
   return (
-<div className="row mb-4">
-  <div className="col-xl-3 col-md-6 mb-4">
+<div className="row mb-3">
+  <div className="col-xl-3 col-md-6 mb-4 stats-wrap">
     <div className="stats-card card-pending">
       <div className="card-content">
         <div className="card-label">Preauthorization Raised</div>
@@ -25,7 +25,7 @@ const StatsCards = () => {
       </div>
     </div>
   </div>
-  <div className="col-xl-3 col-md-6 mb-4">
+  <div className="col-xl-3 col-md-6 mb-4 stats-wrap">
     <div className="stats-card card-active">
       <div className="card-content">
         <div className="card-label">Preauthorization Approved</div>
@@ -47,7 +47,7 @@ const StatsCards = () => {
       </div>
     </div>
   </div>
-  <div className="col-xl-3 col-md-6 mb-4">
+  <div className="col-xl-3 col-md-6 mb-4 stats-wrap">
     <div className="stats-card card-closed">
       <div className="card-content">
         <div className="card-label">DM Approval</div>
@@ -69,7 +69,7 @@ const StatsCards = () => {
       </div>
     </div>
   </div>
-  <div className="col-xl-3 col-md-6 mb-4">
+  <div className="col-xl-3 col-md-6 mb-4 stats-wrap">
     <div className="stats-card card-total">
       <div className="card-content">
         <div className="card-label">Fund Enhancement</div>

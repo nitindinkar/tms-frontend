@@ -26,7 +26,10 @@ const TIDListing = ({ setShowGenerateModal }) => {
 
   return (
     <div className="card">
-      <div className="search-container">
+      
+      <div className="card-header px-3">
+        <div className="search-container">
+        <h4 className="mb-3">Beneficiary TID Details</h4>
         <div className="row">
           <div className="col-md-8">
             <div className="input-group">
@@ -46,9 +49,6 @@ const TIDListing = ({ setShowGenerateModal }) => {
           </div>
         </div>
       </div>
-
-      <div className="card-header d-flex justify-content-between align-items-center">
-        <h4 className="mb-0">Beneficiary TID Details</h4>
 
       </div>
       <div className="card-body">

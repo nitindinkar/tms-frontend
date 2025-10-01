@@ -3,7 +3,7 @@
     --light-orange: #f06623;
     --light-bg: #f8f9fa;
     --sidebar-width: 250px;
-    --sidebar-collapsed: 70px;
+    --sidebar-collapsed: 50px;
     --header-height: 70px;
     --success-green:#5cb85c;
 }
@@ -45,7 +45,7 @@ body {
 }
 
 .govt-logo {
-    width: 145px;
+    width: 160px;
     margin-right: 10px;
 }
 
@@ -125,6 +125,10 @@ body {
 
 
 /* Sidebar Styles */
+#sidebarToggle{
+    background: var(--light-orange);
+    color: var(--light-bg);
+}
 .sidebar {
     width: var(--sidebar-width);
     background: var(--dark-grey); /* Changed to dark blue */
@@ -181,7 +185,7 @@ body {
 /* Main Content */
 .main-content {
     margin-left: var(--sidebar-width);
-    padding: 20px;
+    padding: 16px 20px 20px 20px;
     transition: all 0.3s ease;
 }
 
@@ -223,6 +227,10 @@ body {
 }
 
 /* Stats Cards - Compact Design */
+.stats-wrap{
+    padding-right: 6px !important;
+    padding-left: 6px !important;
+}
 .stats-card {
     border-radius: 10px;
     padding: 1rem;
@@ -341,8 +349,8 @@ body {
 .search-container {
     background-color: white;
     border-radius: 10px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 6px rgba(240, 102, 35, 0.1); /* Orange shadow */
+    padding: .5rem 0px;
+    /* box-shadow: 0 4px 6px rgba(240, 102, 35, 0.1); */
     padding-bottom: 0px;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;

@@ -161,7 +161,7 @@ const GenerateTidModal = ({ show, handleClose, showSuccess }) => {
                     <h4 className="step-heading">Search Beneficiary</h4>
                     <div className="row">
                       <div className="col-md-4">
-                        <label className="form-label">RTA Accidental Case *</label>
+                        <label className="form-label">RTA Accidental Case <span class="text-danger">*</span></label>
                         <div className="single-select-group">
                           <div className="form-check">
                             <input
@@ -192,7 +192,7 @@ const GenerateTidModal = ({ show, handleClose, showSuccess }) => {
                         </div>
                       </div>
                       <div className="col-md-4">
-                        <label className="form-label">Admission Type</label>
+                        <label className="form-label">Admission Type <span class="text-danger">*</span></label>
                         <div className="single-select-group">
                           <div className="form-check">
                             <input
@@ -224,7 +224,7 @@ const GenerateTidModal = ({ show, handleClose, showSuccess }) => {
                       </div>
                       {admissionType === 'normal' &&(
                       <div className="col-md-4">
-                        <label className="form-label">Do you have Jan Aadhaar ID? *</label>
+                        <label className="form-label">Do you have Jan Aadhaar ID? <span class="text-danger">*</span></label>
                         <div className="single-select-group">
                           <div className="form-check">
                             <input
@@ -444,7 +444,7 @@ const GenerateTidModal = ({ show, handleClose, showSuccess }) => {
                     {hasJanAadhaar && admissionType === 'normal' && (
                     <div className="row">
                       <div className="col-md-4 mb-3">
-                        <label className="form-label">Identity Type *</label>
+                        <label className="form-label">Identity Type <span class="text-danger">*</span></label>
                         <select className="form-select">
                           <option>Select Identity Type</option>
                           <option>Aadhaar Card</option>
@@ -454,7 +454,7 @@ const GenerateTidModal = ({ show, handleClose, showSuccess }) => {
                         </select>
                       </div>
                       <div className="col-md-4 mb-3">
-                        <label className="form-label">Identity Number *</label>
+                        <label className="form-label">Identity Number <span class="text-danger">*</span></label>
                         <input
                           type="text"
                           className="form-control"
@@ -546,7 +546,7 @@ const GenerateTidModal = ({ show, handleClose, showSuccess }) => {
                         {/* Verify By Field */}
                         <div className="row mb-3">
                           <div className="col-md-12">
-                            <label className="form-label">Verify By? *</label>
+                            <label className="form-label">Verify By? <span class="text-danger">*</span></label>
                             <div className="single-select-group">
                               <div className="form-check">
                                 <input
@@ -581,7 +581,7 @@ const GenerateTidModal = ({ show, handleClose, showSuccess }) => {
                               <div id="moic-doc-upload" className="moic-doc-upload mt-3 p-3 border rounded ">
                                 <div className='row'>
                                   <div className="col-md-10">
-                                  <label className="form-label">Upload MOIC Approved Document *</label>
+                                  <label className="form-label">Upload MOIC Approved Document <span class="text-danger">*</span></label>
                                   <input
                                     type="file"
                                     className="form-control"
@@ -755,7 +755,7 @@ const GenerateTidModal = ({ show, handleClose, showSuccess }) => {
                         
                         <div className="row">
                           <div className="col-md-6 mb-3">
-                            <label className="form-label">Patient Name *</label>
+                            <label className="form-label">Patient Name <span class="text-danger">*</span></label>
                             <input
                               type="text"
                               className="form-control"
@@ -773,7 +773,7 @@ const GenerateTidModal = ({ show, handleClose, showSuccess }) => {
                           </div>
                           
                           <div className="col-md-3 mb-3">
-                            <label className="form-label">Gender *</label>
+                            <label className="form-label">Gender <span class="text-danger">*</span></label>
                             <div className="single-select-group">
                               <div className="form-check">
                                 <input
@@ -867,7 +867,7 @@ const GenerateTidModal = ({ show, handleClose, showSuccess }) => {
                         
                         <div className="row">
                           <div className="col-md-6 mb-3">
-                            <label className="form-label">Incident District *</label>
+                            <label className="form-label">Incident District <span class="text-danger">*</span></label>
                             <select 
                               className="form-select"
                             >
@@ -890,7 +890,7 @@ const GenerateTidModal = ({ show, handleClose, showSuccess }) => {
                         
                         <div className="row">
                           <div className="col-md-6 mb-3">
-                            <label className="form-label">Residence State *</label>
+                            <label className="form-label">Residence State <span class="text-danger">*</span></label>
                             <select 
                               className="form-select"
                             >
@@ -902,7 +902,7 @@ const GenerateTidModal = ({ show, handleClose, showSuccess }) => {
                           </div>
                           
                           <div className="col-md-6 mb-3">
-                            <label className="form-label">Residence District *</label>
+                            <label className="form-label">Residence District <span class="text-danger">*</span></label>
                             <select 
                               className="form-select"
                             >
@@ -975,7 +975,7 @@ const GenerateTidModal = ({ show, handleClose, showSuccess }) => {
                         <div id="moic-doc-upload" className="moic-doc-upload mt-3 p-3 border rounded ">
                           <div className='row'>
                             <div className="col-md-10">
-                            <label className="form-label">Upload MOIC Approved Document *</label>
+                            <label className="form-label">Upload MOIC Approved Document <span class="text-danger">*</span></label>
                             <input
                               type="file"
                               className="form-control"

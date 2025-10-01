@@ -31,13 +31,7 @@ const Header = ({ toggleSidebar, sidebarCollapsed }) => {
             className="logo-img" 
             alt="Logo" 
           />
-          <button 
-            id="sidebarToggle" 
-            className="btn btn-sm btn-dark mx-3"
-            onClick={toggleSidebar}
-          >
-            <i className={`bi ${sidebarCollapsed ? 'bi-layout-sidebar' : 'bi-list'}`}></i>
-          </button>
+
         </div>
         <div className="header-title-text">
           <h4 className="mb-0 header-title">Mukhyamantri Ayushman Arogya Yojana</h4>

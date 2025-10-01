@@ -16,7 +16,7 @@ const Layout = () => {
     <>
     <div className="App">
       <Header toggleSidebar={toggleSidebar} sidebarCollapsed={sidebarCollapsed} />
-      <Sidebar collapsed={sidebarCollapsed} />
+      <Sidebar collapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />
       <div className={`main-content ${sidebarCollapsed ? 'expanded' : ''}`} id="mainContent" >
           <Outlet />
         <Footer />
