@@ -19,7 +19,7 @@ const Header = ({ toggleSidebar, sidebarCollapsed }) => {
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light">
-      <div className="container-fluid px-0">
+      <div className="container-fluid px-0 header-container">
         <div className="header-logos">
           <img
             src={rajLogo}

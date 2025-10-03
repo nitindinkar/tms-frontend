@@ -204,6 +204,13 @@ body {
     .main-content {
         margin-left: 0;
     }
+    .header-title-text{
+        display: none;
+    }
+    .header-container{
+        justify-content: start !important;
+    }
+
 }
 
 /* Card Styles */

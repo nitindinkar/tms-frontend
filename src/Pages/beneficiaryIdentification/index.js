@@ -15,9 +15,7 @@ const BeneficiaryIdentification = ({ sidebarCollapsed }) => {
       <div className="container-fluid" setShowGenerateModal={setShowGenerateModal}>
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h1 className="h3 mb-0">Beneficiary Identification</h1>
-          <button className="btn btn-dark d-md-none" type="button" data-bs-toggle="collapse" data-bs-target="#mobileNav">
-            <i className="bi bi-list"></i> Menu
-          </button>
+
         </div>
         
         <StatsCards />

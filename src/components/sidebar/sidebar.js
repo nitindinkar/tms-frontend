@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 
 const Sidebar = ({ collapsed, toggleSidebar }) => {
   const navigate = useNavigate();
@@ -26,54 +26,84 @@ const Sidebar = ({ collapsed, toggleSidebar }) => {
       <div className="sidebar-sticky">
         <ul className="nav flex-column">
           <li className="nav-item">
-            <a className="nav-link active" href="#">
+            <NavLink 
+              to="/beneficiary-identification" 
+              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+            >
               <i className="bi bi-person-plus"></i> <span>Beneficiary Identification</span>
-            </a>
+            </NavLink>
           </li>
           <li className="nav-item">
-            <a className="nav-link" href="#">
+            <NavLink 
+              to="/pre-authorization" 
+              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+            >
               <i className="bi bi-file-medical"></i> <span>Pre Authorization</span>
-            </a>
+            </NavLink>
           </li>
           <li className="nav-item">
-            <a className="nav-link" href="#">
+            <NavLink 
+              to="/claims" 
+              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+            >
               <i className="bi bi-file-earmark-text"></i> <span>Claims</span>
-            </a>
+            </NavLink>
           </li>
           <li className="nav-item">
-            <a className="nav-link" href="#">
+            <NavLink 
+              to="/reports" 
+              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+            >
               <i className="bi bi-bar-chart"></i> <span>Reports</span>
-            </a>
+            </NavLink>
           </li>
           <li className="nav-item">
-            <a className="nav-link" href="#">
+            <NavLink 
+              to="/hospital-empanelment" 
+              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+            >
               <i className="bi bi-hospital"></i> <span>Hospital Empanelment</span>
-            </a>
+            </NavLink>
           </li>
           <li className="nav-item">
-            <a className="nav-link" href="#">
+            <NavLink 
+              to="/user-management" 
+              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+            >
               <i className="bi bi-people"></i> <span>User Management</span>
-            </a>
+            </NavLink>
           </li>
           <li className="nav-item">
-            <a className="nav-link" href="#">
+            <NavLink 
+              to="/helpdesk" 
+              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+            >
               <i className="bi bi-headset"></i> <span>Helpdesk</span>
-            </a>
+            </NavLink>
           </li>
           <li className="nav-item">
-            <a className="nav-link" href="#">
+            <NavLink 
+              to="/notifications" 
+              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+            >
               <i className="bi bi-bell"></i> <span>Notifications</span>
-            </a>
+            </NavLink>
           </li>
           <li className="nav-item">
-            <a className="nav-link" href="#">
+            <NavLink 
+              to="/settings" 
+              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+            >
               <i className="bi bi-gear"></i> <span>Settings</span>
-            </a>
+            </NavLink>
           </li>
           <li className="nav-item">
-            <a className="nav-link" href="#" onClick={handleLogout}>
+            <button 
+              className="nav-link btn btn-link text-start" 
+              onClick={handleLogout}
+            >
               <i className="bi bi-box-arrow-right"></i> <span>Logout</span>
-            </a>
+            </button>
           </li>
         </ul>
       </div>
