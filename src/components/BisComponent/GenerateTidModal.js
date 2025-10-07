@@ -278,7 +278,7 @@ const GenerateTidModal = ({
 
       <Modal.Body>
         {/* Step Indicator */}
-        <div className="step-indicator mb-4">
+        <div className="step-indicator mb-2">
           {stepsToDisplay.map((step) => (
             <div
               key={step.actualStep}
@@ -447,12 +447,12 @@ const GenerateTidModal = ({
             {admissionType === "emergency" && (
               <div
                 id="emergency-form"
-                className="emergency-form mb-3 mt-3 p-3 border rounded"
+                className="emergency-form p-3 border rounded"
               >
                 <div className="emergency-section">
                   <h5>Patient Details</h5>
                   <div className="row">
-                    <div className="col-md-6 mb-3">
+                    <div className="col-md-6 mb-2">
                       <label className="form-label">Patient Name</label>
                       <input
                         type="text"
@@ -460,7 +460,7 @@ const GenerateTidModal = ({
                         placeholder="Enter patient name"
                       />
                     </div>
-                    <div className="col-md-3 mb-3">
+                    <div className="col-md-3 mb-2">
                       <label className="form-label">Age</label>
                       <input
                         type="number"
@@ -563,7 +563,7 @@ const GenerateTidModal = ({
                       className="mlc-details bg-light rounded"
                     >
                       <div className="row">
-                        <div className="col-md-12 mb-3">
+                        <div className="col-md-12 mb-2">
                           <label className="form-label">
                             Assault And Battery, Including Domestic Violence
                           </label>
@@ -639,7 +639,7 @@ const GenerateTidModal = ({
                     >
                       <h5>Details of Person Identifying Patient</h5>
                       <div className="row">
-                        <div className="col-md-4 mb-3">
+                        <div className="col-md-4 mb-2">
                           <label className="form-label">
                             Name of the Person Identifying Patient
                           </label>
@@ -649,7 +649,7 @@ const GenerateTidModal = ({
                             placeholder="Enter name"
                           />
                         </div>
-                        <div className="col-md-4 mb-3">
+                        <div className="col-md-4 mb-2">
                           <label className="form-label">
                             Relationship with Patient
                           </label>
@@ -659,7 +659,7 @@ const GenerateTidModal = ({
                             placeholder="Enter relationship"
                           />
                         </div>
-                        <div className="col-md-4 mb-3">
+                        <div className="col-md-4 mb-2">
                           <label className="form-label">Contact No.</label>
                           <input
                             type="tel"
@@ -677,7 +677,7 @@ const GenerateTidModal = ({
             {/* Identity Details - Conditionally Shown */}
             {hasJanAadhaar && admissionType === "normal" && (
               <div className="row">
-                <div className="col-md-4 mb-3">
+                <div className="col-md-4 mb-2">
                   <label className="form-label">
                     Identity Type <span className="text-danger">*</span>
                   </label>
@@ -689,7 +689,7 @@ const GenerateTidModal = ({
                     <option>PAN Card</option>
                   </select>
                 </div>
-                <div className="col-md-4 mb-3">
+                <div className="col-md-4 mb-2">
                   <label className="form-label">
                     Identity Number <span className="text-danger">*</span>
                   </label>
@@ -708,67 +708,67 @@ const GenerateTidModal = ({
           <div className="tab-pane fade show active">
             <h4 className="step-heading">Contact Details of Beneficiary</h4>
             <div className="row">
-              <div className="col-md-4 mb-3">
+              <div className="col-md-4 mb-2">
                 <label className="form-label">Entitlement Type</label>
                 <div className="form-control bg-light">NFSA</div>
               </div>
-              <div className="col-md-4 mb-3">
+              <div className="col-md-4 mb-2">
                 <label className="form-label">Ration Card No</label>
                 <div className="form-control bg-light">123456789</div>
               </div>
-              <div className="col-md-4 mb-3">
+              <div className="col-md-4 mb-2">
                 <label className="form-label">Mobile No</label>
                 <div className="form-control bg-light">123456789</div>
               </div>
             </div>
             <div className="row">
-              <div className="col-md-4 mb-3">
+              <div className="col-md-4 mb-2">
                 <label className="form-label">House Number</label>
                 <div className="form-control bg-light">123</div>
               </div>
-              <div className="col-md-4 mb-3">
+              <div className="col-md-4 mb-2">
                 <label className="form-label">Colony/Street</label>
                 <div className="form-control bg-light">ABCD Colony</div>
               </div>
-              <div className="col-md-4 mb-3">
+              <div className="col-md-4 mb-2">
                 <label className="form-label">Block/Ward</label>
                 <div className="form-control bg-light">Ward No 26</div>
               </div>
             </div>
             <div className="row">
-              <div className="col-md-4 mb-3">
+              <div className="col-md-4 ">
                 <label className="form-label">Gram Panchayat</label>
                 <div className="form-control bg-light">Abc Grampanchayat</div>
               </div>
-              <div className="col-md-4 mb-3">
+              <div className="col-md-4 ">
                 <label className="form-label">Village</label>
                 <div className="form-control bg-light">ABC Village</div>
               </div>
-              <div className="col-md-4 mb-3">
+              <div className="col-md-4 ">
                 <label className="form-label">Tehsil</label>
                 <div className="form-control bg-light">ABCD</div>
               </div>
             </div>
             <div className="row">
-              <div className="col-md-4 mb-3">
+              <div className="col-md-4 ">
                 <label className="form-label">District</label>
                 <div className="form-control bg-light">Abc District</div>
               </div>
-              <div className="col-md-4 mb-3">
+              <div className="col-md-4 ">
                 <label className="form-label">State</label>
                 <div className="form-control bg-light">Rajasthan</div>
               </div>
-              <div className="col-md-4 mb-3">
+              <div className="col-md-4 ">
                 <label className="form-label">Pincode</label>
                 <div className="form-control bg-light">303303</div>
               </div>
             </div>
             <div className="row">
-              <div className="col-md-6 mb-3">
+              <div className="col-md-6 ">
                 <label className="form-label">Bhamasha ID</label>
                 <div className="form-control bg-light">ABCDEFGH</div>
               </div>
-              <div className="col-md-6 mb-3">
+              <div className="col-md-6 ">
                 <label className="form-label">Jan Aadhaar ID</label>
                 <div className="form-control bg-light">4XXXXXXXX88</div>
               </div>
@@ -782,7 +782,7 @@ const GenerateTidModal = ({
               <>
                 <h4 className="step-heading">Member Details of Beneficiary</h4>
                 {/* Verify By Field */}
-                <div className="row mb-3">
+                <div className="row">
                   <div className="col-md-12">
                     <label className="form-label">
                       Verify By? <span className="text-danger">*</span>
@@ -1037,6 +1037,54 @@ const GenerateTidModal = ({
                           </div>
                         </td>
                       </tr>
+                      <tr>
+                        <td>
+                          <div className="form-check">
+                            <input
+                              className="form-check-input"
+                              type="checkbox"
+                            />
+                          </div>
+                        </td>
+                        <td>Rahul</td>
+                        <td>राहुल</td>
+                        <td>Male</td>
+                        <td>7</td>
+                        <td>INSTANT</td>
+                        <td>XXXXXXXX8654</td>
+                        <td>
+                          <span className="badge bg-warning text-dark">
+                            Pending
+                          </span>
+                        </td>
+                        <td>
+                          <div className="dropdown">
+                            <Dropdown>
+                              <Dropdown.Toggle
+                                variant="outline-secondary"
+                                size="sm"
+                                disabled={verifyMethod === "moic"}
+                              >
+                                <i className="bi bi-three-dots-vertical"></i>
+                              </Dropdown.Toggle>
+                              <Dropdown.Menu>
+                                <Dropdown.Item href="#">
+                                  <i className="bi bi-person-check" /> Verify
+                                  Aadhaar
+                                </Dropdown.Item>
+                                <Dropdown.Item href="#">
+                                  <i className="bi bi-plus-circle" /> Create
+                                  ABHA
+                                </Dropdown.Item>
+                                <Dropdown.Item href="#">
+                                  <i className="bi bi-arrow-repeat" />{" "}
+                                  Verified/Update ABHA
+                                </Dropdown.Item>
+                              </Dropdown.Menu>
+                            </Dropdown>
+                          </div>
+                        </td>
+                      </tr>
                     </tbody>
                   </table>
                 </div>
@@ -1049,7 +1097,7 @@ const GenerateTidModal = ({
                 <h5 className="step-heading">Instant Beneficiary Details</h5>
 
                 <div className="row">
-                  <div className="col-md-6 mb-3">
+                  <div className="col-md-4 mb-2">
                     <label className="form-label">
                       Patient Name <span className="text-danger">*</span>
                     </label>
@@ -1060,7 +1108,7 @@ const GenerateTidModal = ({
                     />
                   </div>
 
-                  <div className="col-md-3 mb-3">
+                  <div className="col-md-4 mb-2">
                     <label className="form-label">Age</label>
                     <input
                       type="number"
@@ -1069,7 +1117,7 @@ const GenerateTidModal = ({
                     />
                   </div>
 
-                  <div className="col-md-3 mb-3">
+                  <div className="col-md-4 mb-2">
                     <label className="form-label">
                       Gender <span className="text-danger">*</span>
                     </label>
@@ -1112,10 +1160,8 @@ const GenerateTidModal = ({
                       </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="row">
-                  <div className="col-md-6 mb-3">
+                  <div className="col-md-4 mb-2">
                     <label className="form-label">Mobile No</label>
                     <input
                       type="tel"
@@ -1124,7 +1170,7 @@ const GenerateTidModal = ({
                     />
                   </div>
 
-                  <div className="col-md-6 mb-3">
+                  <div className="col-md-4 mb-2">
                     <label className="form-label">House No</label>
                     <input
                       type="text"
@@ -1132,10 +1178,8 @@ const GenerateTidModal = ({
                       placeholder="Enter house number"
                     />
                   </div>
-                </div>
 
-                <div className="row">
-                  <div className="col-md-6 mb-3">
+                  <div className="col-md-4 mb-2">
                     <label className="form-label">Colony/Street</label>
                     <input
                       type="text"
@@ -1144,7 +1188,7 @@ const GenerateTidModal = ({
                     />
                   </div>
 
-                  <div className="col-md-6 mb-3">
+                  <div className="col-md-4 mb-2">
                     <label className="form-label">Block/Ward</label>
                     <input
                       type="text"
@@ -1152,10 +1196,8 @@ const GenerateTidModal = ({
                       placeholder="Enter block/ward"
                     />
                   </div>
-                </div>
 
-                <div className="row">
-                  <div className="col-md-6 mb-3">
+                  <div className="col-md-4 mb-2">
                     <label className="form-label">Village</label>
                     <input
                       type="text"
@@ -1164,7 +1206,7 @@ const GenerateTidModal = ({
                     />
                   </div>
 
-                  <div className="col-md-6 mb-3">
+                  <div className="col-md-4 mb-2">
                     <label className="form-label">Tehsil</label>
                     <input
                       type="text"
@@ -1172,10 +1214,8 @@ const GenerateTidModal = ({
                       placeholder="Enter tehsil"
                     />
                   </div>
-                </div>
 
-                <div className="row">
-                  <div className="col-md-6 mb-3">
+                  <div className="col-md-6 mb-2">
                     <label className="form-label">
                       Incident District <span className="text-danger">*</span>
                     </label>
@@ -1187,7 +1227,7 @@ const GenerateTidModal = ({
                     </select>
                   </div>
 
-                  <div className="col-md-6 mb-3">
+                  <div className="col-md-6 mb-2">
                     <label className="form-label">Pin Code</label>
                     <input
                       type="text"
@@ -1195,10 +1235,8 @@ const GenerateTidModal = ({
                       placeholder="Enter pin code"
                     />
                   </div>
-                </div>
-
-                <div className="row">
-                  <div className="col-md-6 mb-3">
+ 
+                  <div className="col-md-6 mb-2">
                     <label className="form-label">
                       Residence State <span className="text-danger">*</span>
                     </label>
@@ -1210,7 +1248,7 @@ const GenerateTidModal = ({
                     </select>
                   </div>
 
-                  <div className="col-md-6 mb-3">
+                  <div className="col-md-6 mb-2">
                     <label className="form-label">
                       Residence District <span className="text-danger">*</span>
                     </label>
@@ -1283,7 +1321,7 @@ const GenerateTidModal = ({
                     className="moic-doc-upload m-0 p-3 border rounded "
                   >
                     <div className="row">
-                      <div className="col-md-12 mb-3">
+                      <div className="col-md-12 mb-2">
                         <label className="form-label">Aadhaar No</label>
                         <div className="d-flex align-items-center">
                           <input
@@ -1337,7 +1375,7 @@ const GenerateTidModal = ({
                 )}
 
                 {/* Instant Approval Document Section */}
-                <div className="instant-approval-section mt-4 p-3 border rounded bg-light">
+                <div className="instant-approval-section mt-3 p-3 border rounded bg-light">
                   <h5 className="mb-3">Instant Approval Document</h5>
                   <p className="small text-muted mb-3">
                     Citizen is not enrolled with MAA Yojana. In case of

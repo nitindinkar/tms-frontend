@@ -56,3 +56,4 @@ const SuccessModal = ({ show, handleClose }) => {
 };
 
 export default SuccessModal;
+

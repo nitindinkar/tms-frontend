@@ -6,7 +6,9 @@ import Swal from "sweetalert2";
 
 const PreAuthFormModal = ({ show, handleClose }) => {
   const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState({
+  
+  // Define initial form data separately so we can reset to it
+  const initialFormData = {
     // Step 1 - Patient Details
     tid: "T0909254271667",
     patientName: "Suraj Kumar",
@@ -28,7 +30,9 @@ const PreAuthFormModal = ({ show, handleClose }) => {
     doctorPrescription: null,
     otherDocuments: [],
     finalRemarks: ""
-  });
+  };
+
+  const [formData, setFormData] = useState(initialFormData);
 
   // Mock data for packages
   const [packages, setPackages] = useState([]);
@@ -50,6 +54,24 @@ const PreAuthFormModal = ({ show, handleClose }) => {
     file: null,
     remarks: ""
   });
+
+  // Reset form when modal closes
+  useEffect(() => {
+    if (!show) {
+      // Reset all state variables when modal closes
+      setCurrentStep(1);
+      setFormData(initialFormData);
+      setSpecialtySearch("");
+      setPackageSearch("");
+      setDoctorPrescriptionFile(null);
+      setOtherDocumentData({
+        documentType: "",
+        packageCode: "",
+        file: null,
+        remarks: ""
+      });
+    }
+  }, [show]);
 
   // Mock data for doctors
   const doctors = [
@@ -80,14 +102,14 @@ const PreAuthFormModal = ({ show, handleClose }) => {
   useEffect(() => {
     // Simulate API call to get packages
     const mockPackages = [
-      { id: 1, code: "PKG001", name: "Cardiac Bypass Surgery", category: "Tertiary", rate: 150000, specialty: "Cardiology" },
-      { id: 2, code: "PKG002", name: "Knee Replacement", category: "Secondary", rate: 80000, specialty: "Orthopedics" },
-      { id: 3, code: "PKG003", name: "Cataract Surgery", category: "Secondary", rate: 15000, specialty: "Ophthalmology" },
-      { id: 4, code: "PKG004", name: "Neuro Surgery", category: "Tertiary", rate: 200000, specialty: "Neurology" },
-      { id: 5, code: "PKG005", name: "Normal Delivery", category: "Secondary", rate: 10000, specialty: "Gynecology" },
-      { id: 6, code: "PKG006", name: "C-Section", category: "Secondary", rate: 20000, specialty: "Gynecology" },
-      { id: 7, code: "PKG007", name: "Appendectomy", category: "Secondary", rate: 25000, specialty: "General Surgery" },
-      { id: 8, code: "PKG008", name: "Heart Valve Replacement", category: "Tertiary", rate: 180000, specialty: "Cardiology" }
+      { id: 1, code: "PKG001", name: "Cardiac Bypass Surgery", category: "Tertiary", rate: 150000, bookedAmount:150000, specialty: "Cardiology" },
+      { id: 2, code: "PKG002", name: "Knee Replacement", category: "Secondary", rate: 80000, bookedAmount:80000, specialty: "Orthopedics" },
+      { id: 3, code: "PKG003", name: "Cataract Surgery", category: "Secondary", rate: 15000, bookedAmount:15000, specialty: "Ophthalmology" },
+      { id: 4, code: "PKG004", name: "Neuro Surgery", category: "Tertiary", rate: 200000, bookedAmount:200000, specialty: "Neurology" },
+      { id: 5, code: "PKG005", name: "Normal Delivery", category: "Secondary", rate: 10000, bookedAmount:10000, specialty: "Gynecology" },
+      { id: 6, code: "PKG006", name: "C-Section", category: "Secondary", rate: 20000, bookedAmount:20000, specialty: "Gynecology" },
+      { id: 7, code: "PKG007", name: "Appendectomy", category: "Secondary", rate: 25000, bookedAmount:25000, specialty: "General Surgery" },
+      { id: 8, code: "PKG008", name: "Heart Valve Replacement", category: "Tertiary", rate: 180000, bookedAmount:180000, specialty: "Cardiology" }
     ];
     setPackages(mockPackages);
     setFilteredPackages(mockPackages);
@@ -130,7 +152,7 @@ const PreAuthFormModal = ({ show, handleClose }) => {
   const handlePackageSelect = (pkg) => {
     setFormData(prev => ({
       ...prev,
-      selectedPackages: [...prev.selectedPackages, { ...pkg, prescribingDoctor: "", bookedAmount: "" }]
+      selectedPackages: [...prev.selectedPackages, { ...pkg, prescribingDoctor: "" }]
     }));
   };
 
@@ -338,26 +360,6 @@ const PreAuthFormModal = ({ show, handleClose }) => {
     });
     
     // Reset form and close modal
-    setCurrentStep(1);
-    setFormData({
-      tid: "T0909254271667",
-      patientName: "Suraj Kumar",
-      patientNameHindi: "सूरज कुमार",
-      policyYear: "2025-2026",
-      registeredMobNo: "9079073013",
-      referencedTID: "None",
-      admissionNo: "None",
-      beneficiaryEnrollMobNo: "5126753785",
-      rtaFlag: "No",
-      gender: "Male",
-      specialty: "",
-      selectedPackages: [],
-      documents: [],
-      doctorPrescription: null,
-      otherDocuments: [],
-      finalRemarks: ""
-    });
-    
     handleClose();
   };
 
@@ -664,8 +666,8 @@ const PreAuthFormModal = ({ show, handleClose }) => {
                         <th>Package Name</th>
                         <th>Package Category</th>
                         <th>Package Rate (₹)</th>
-                        <th>Prescribing Doctor</th>
                         <th>Booked Amount (₹)</th>
+                        <th>Prescribing Doctor</th>
                         <th>Action</th>
                       </tr>
                     </thead>
@@ -676,6 +678,7 @@ const PreAuthFormModal = ({ show, handleClose }) => {
                           <td>{pkg.name}</td>
                           <td>{pkg.category}</td>
                           <td>₹{pkg.rate.toLocaleString()}</td>
+                          <td>₹{pkg.bookedAmount.toLocaleString()}</td>
                           <td>
                             <Form.Select
                               size="sm"
@@ -687,15 +690,6 @@ const PreAuthFormModal = ({ show, handleClose }) => {
                                 <option key={doctor} value={doctor}>{doctor}</option>
                               ))}
                             </Form.Select>
-                          </td>
-                          <td>
-                            <Form.Control
-                              type="number"
-                              size="sm"
-                              value={pkg.bookedAmount}
-                              onChange={(e) => updatePackageField(index, 'bookedAmount', e.target.value)}
-                              placeholder="Enter amount"
-                            />
                           </td>
                           <td>
                             <Button

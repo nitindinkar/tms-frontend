@@ -304,10 +304,10 @@ body {
 }
 
 .card-total {
-    background: linear-gradient(45deg, #2196f3, #3f51b5);
+    background: linear-gradient(45deg, #2196f3, #b6c2ff);
 }
 .card-queries {
-    background: linear-gradient(135deg, #ff9800, #ffc107); 
+background: linear-gradient(135deg, #2a9451, #009a82);
 }
 
 /* Buttons */
@@ -584,7 +584,7 @@ body {
 /* Step headings */
 .step-heading {
     color: var(--light-orange);
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.5rem;
     padding-bottom: 0.5rem;
     border-bottom: 2px solid var(--light-orange);
 }
