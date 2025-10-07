@@ -262,11 +262,22 @@ const GenerateTidModal = ({
     }
   };
 
+  const clearStates = () => {
+    stopCamera();
+    handleClose();
+    setPhoto(null);
+    setStreaming(false);
+    setCameraError("");
+    setIsFrontCamera(false);
+    fileInputRef.current = null;
+    setPhotoSaved(false);
+  };
+
   const stepsToDisplay = getStepsToDisplay();
   return (
     <Modal
       show={show}
-      onHide={handleClose}
+      onHide={clearStates}
       size="xl"
       className="animate__animated animate__fadeInDown animate__faster"
       centered
@@ -1235,7 +1246,7 @@ const GenerateTidModal = ({
                       placeholder="Enter pin code"
                     />
                   </div>
- 
+
                   <div className="col-md-6 mb-2">
                     <label className="form-label">
                       Residence State <span className="text-danger">*</span>
@@ -1667,17 +1678,13 @@ const GenerateTidModal = ({
         <button
           type="button"
           className="btn-close btn-customeclose"
-          onClick={handleClose}
+          onClick={clearStates}
         >
           {" "}
           Close
         </button>
         {currentStep > 1 && (
-          <Button
-            type="button"
-            variant="outline-secondary"
-            onClick={prevStep}
-          >
+          <Button type="button" variant="outline-secondary" onClick={prevStep}>
             <i className="bi bi-arrow-left"></i> Back
           </Button>
         )}
@@ -1686,11 +1693,7 @@ const GenerateTidModal = ({
             Next <i className="bi bi-arrow-right"></i>
           </Button>
         ) : (
-          <Button
-            type="button"
-            variant="success"
-            onClick={generateTid}
-          >
+          <Button type="button" variant="success" onClick={generateTid}>
             <i className="bi bi-check-circle"></i> Generate TID
           </Button>
         )}
