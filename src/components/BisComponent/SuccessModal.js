@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal } from 'react-bootstrap';
+import { Button, Modal } from 'react-bootstrap';
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const SuccessModal = ({ show, handleClose }) => {

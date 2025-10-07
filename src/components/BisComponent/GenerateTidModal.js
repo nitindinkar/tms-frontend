@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "animate.css";
-import { Modal, Dropdown } from "react-bootstrap";
+import { Modal, Dropdown, Button } from "react-bootstrap";
 import Swal from "sweetalert2"; // Import SweetAlert2
 
 const GenerateTidModal = ({
@@ -270,6 +270,7 @@ const GenerateTidModal = ({
       size="xl"
       className="animate__animated animate__fadeInDown animate__faster"
       centered
+      backdrop="static"
     >
       <Modal.Header closeButton>
         <Modal.Title>Generate New TID</Modal.Title>
@@ -1634,26 +1635,26 @@ const GenerateTidModal = ({
           Close
         </button>
         {currentStep > 1 && (
-          <button
+          <Button
             type="button"
-            className="btn btn-outline-secondary"
+            variant="outline-secondary"
             onClick={prevStep}
           >
             <i className="bi bi-arrow-left"></i> Back
-          </button>
+          </Button>
         )}
         {currentStep < 4 ? (
-          <button type="button" className="btn btn-success" onClick={nextStep}>
+          <Button type="button" variant="success" onClick={nextStep}>
             Next <i className="bi bi-arrow-right"></i>
-          </button>
+          </Button>
         ) : (
-          <button
+          <Button
             type="button"
-            className="btn btn-success"
+            variant="success"
             onClick={generateTid}
           >
             <i className="bi bi-check-circle"></i> Generate TID
-          </button>
+          </Button>
         )}
       </Modal.Footer>
     </Modal>
