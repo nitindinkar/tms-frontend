@@ -860,19 +860,44 @@ const PreAuthFormModal = ({ show, handleClose }) => {
                     </Form.Text>
                   </Col>
 
-                  <Col md={6}>
+                  <Col md={6} className="position-relative">
                     <Form.Label className="fw-bold">Enter Remarks:</Form.Label>
-                    <Form.Control
-                      as="textarea"
-                      rows={2}
-                      value={otherDocumentData.remarks}
-                      onChange={(e) => setOtherDocumentData(prev => ({
-                        ...prev,
-                        remarks: e.target.value
-                      }))}
-                      placeholder="Enter remarks..."
-                    />
+                    <div style={{ position: 'relative' }}>
+                      <Form.Control
+                        as="textarea"
+                        rows={2}
+                        value={otherDocumentData.remarks}
+                        onChange={(e) => {
+                          if (e.target.value.length <= 500) {
+                            setOtherDocumentData(prev => ({
+                              ...prev,
+                              remarks: e.target.value
+                            }));
+                          }
+                        }}
+                        placeholder="Enter remarks..."
+                        style={{
+                          paddingBottom: '25px', // space for counter
+                          resize: 'none'
+                        }}
+                      />
+                      <small
+                        style={{
+                          position: 'absolute',
+                          bottom: '6px',
+                          right: '12px',
+                          fontSize: '12px',
+                          color: otherDocumentData.remarks.length === 500 ? 'red' : '#6c757d',
+                          pointerEvents: 'none',
+                          background: '#fff',
+                          padding: '0 4px',
+                        }}
+                      >
+                        {otherDocumentData.remarks.length}/500
+                      </small>
+                    </div>
                   </Col>
+
 
                   <Col md={12}>
                     <div className="d-flex justify-content-end gap-2">

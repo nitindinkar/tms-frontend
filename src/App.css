@@ -168,10 +168,12 @@ body {
 }
 
 .sidebar .nav-link {
-    color: #ecf0f1;
-    padding: 0.75rem 1rem;
+    color: var(--light-bg);
+    padding: 0.75rem .75rem;
     border-left: 3px solid transparent;
-    white-space: nowrap;
+    white-space: normal;
+    word-wrap: break-word;
+    font-size: 0.8rem;
 }
 
 .sidebar .nav-link:hover {
@@ -186,10 +188,12 @@ body {
 }
 
 .sidebar .nav-link i {
-    margin-right: 10px;
+    margin-right: 6px;
     width: 24px;
     text-align: center;
 }
+
+
 
 /* Main Content */
 .main-content {
