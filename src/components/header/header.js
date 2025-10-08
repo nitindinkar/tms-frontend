@@ -10,54 +10,55 @@ const Header = ({ toggleSidebar, sidebarCollapsed }) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    // Clear any user-related data if needed
     localStorage.clear(); 
     sessionStorage.clear();
-    // Navigate to login page
     navigate('/');
   };
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light">
-      <div className="container-fluid px-0 header-container">
-        <div className="header-logos">
-          <img
-            src={rajLogo}
-            className="govt-logo"
-            alt="Government Logo"
-          />
-          <img 
-            src={logo}
-            className="logo-img" 
-            alt="Logo" 
-          />
-
+      <div className="container-fluid px-0 header-container d-flex align-items-center justify-content-between">
+        {/* Logos */}
+        <div className="header-logos d-flex align-items-center">
+          <img src={rajLogo} className="govt-logo" alt="Government Logo" />
+          <img src={logo} className="logo-img ms-2" alt="Logo" />
         </div>
-        <div className="header-title-text">
+
+        {/* Title */}
+        <div className="header-title-text text-center">
           <h4 className="mb-0 header-title">Mukhyamantri Ayushman Arogya Yojana</h4>
-          <span className="header-subtitle">Rajasthan State Health Authority</span>
+          <span className="header-subtitle">Rajasthan State Health Assurance Agency</span>
         </div>
-        
-        {/* User Profile Dropdown */}
-        <Dropdown align="end">
-          <Dropdown.Toggle className="d-flex align-items-center text-white bg-transparent border-0 shadow-none">
-            <div className="avatar me-2 fs-4"><i className="bi bi-person-fill"></i></div>
-            <div className="text-start">
-              <h6 className="mb-0">Mahatma Gandhi Hospital Jaipur</h6>
-              <small><i>Username</i></small>
-            </div>
-          </Dropdown.Toggle>
 
-          <Dropdown.Menu className='py-0'>
-            <Dropdown.Item href="#"><i className="bi bi-house-door me-2"></i> Home</Dropdown.Item>
-            <Dropdown.Item href="#"><i className="bi bi-key me-2"></i> Change Password</Dropdown.Item>
-            <Dropdown.Item href="#"><i className="bi bi-arrow-left-right me-2"></i> Back to SSO</Dropdown.Item>
-            <Dropdown.Divider />
-            <Dropdown.Item className="text-danger" onClick={handleLogout}>
-              <i className="bi bi-box-arrow-right me-2"></i> Logout
-            </Dropdown.Item>
-          </Dropdown.Menu>
-        </Dropdown>
+        {/* Right side: Font size controls + Profile */}
+        <div className="d-flex align-items-center gap-3">
+          {/* Font size controls */}
+          <div className="d-flex align-items-center gap-1 accessibility">
+            <button className="btn btn-outline-secondary btn-sm">A−</button>
+            <button className="btn btn-outline-secondary btn-sm">A+</button>
+          </div>
+
+          {/* User Profile Dropdown */}
+          <Dropdown align="end">
+            <Dropdown.Toggle className="d-flex align-items-center text-white bg-transparent border-0 shadow-none">
+              <div className="avatar me-2 fs-4"><i className="bi bi-person-fill"></i></div>
+              <div className="text-start">
+                <h6 className="mb-0">Mahatma Gandhi Hospital Jaipur</h6>
+                <small><i>Username</i></small>
+              </div>
+            </Dropdown.Toggle>
+
+            <Dropdown.Menu className='py-0'>
+              <Dropdown.Item href="#"><i className="bi bi-house-door me-2"></i> Home</Dropdown.Item>
+              <Dropdown.Item href="#"><i className="bi bi-key me-2"></i> Change Password</Dropdown.Item>
+              <Dropdown.Item href="#"><i className="bi bi-arrow-left-right me-2"></i> Back to SSO</Dropdown.Item>
+              <Dropdown.Divider />
+              <Dropdown.Item className="text-danger" onClick={handleLogout}>
+                <i className="bi bi-box-arrow-right me-2"></i> Logout
+              </Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        </div>
       </div>
     </nav>
   );

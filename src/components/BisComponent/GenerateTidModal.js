@@ -525,7 +525,7 @@ const GenerateTidModal = ({
                   </div>
                 </div>
                 <div className="emergency-section">
-                  <h5>MLC case</h5>
+                  <h5>Medico-Legal Case (MLC)</h5>
                   <div className="row">
                     <div className="col-md-12">
                       <div className="single-select-group">
@@ -840,7 +840,7 @@ const GenerateTidModal = ({
                           className="form-check-label"
                           htmlFor="verify-moic"
                         >
-                          MOIC (Medical Officer In Charge)
+                          Medical Officer In Charge (MOIC)
                         </label>
                       </div>
                     </div>
@@ -1318,7 +1318,7 @@ const GenerateTidModal = ({
                           className="form-check-label"
                           htmlFor="verification-moic"
                         >
-                          MOIC (Medical Officer In Charge)
+                          Medical Officer In Charge (MOIC)
                         </label>
                       </div>
                     </div>

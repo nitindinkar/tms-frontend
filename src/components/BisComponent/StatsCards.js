@@ -8,16 +8,16 @@ const StatsCards = () => {
     <div className="stats-card card-queries h-100">
       <div className="card-content">
         <div className="card-label">Pre-Auth Raised</div>
-        <div className="card-value">62</div>
+        <div className="card-value">100</div>
         <div className="breakdown">
           <div>
             <strong>Today:</strong> 10
           </div>
           <div>
-            <strong>Yesterday:</strong> 12
+            <strong>Yesterday:</strong> 30
           </div>
           <div>
-            <strong>Last week:</strong> 40
+            <strong>Last week:</strong> 60
           </div>
         </div>
       </div>
@@ -30,16 +30,16 @@ const StatsCards = () => {
     <div className="stats-card card-pending h-100">
       <div className="card-content">
         <div className="card-label">Pre-Auth Approved</div>
-        <div className="card-value">62</div>
+        <div className="card-value">80</div>
         <div className="breakdown">
           <div>
             <strong>Today:</strong> 10
           </div>
           <div>
-            <strong>Yesterday:</strong> 12
+            <strong>Yesterday:</strong> 10
           </div>
           <div>
-            <strong>Last week:</strong> 40
+            <strong>Last week:</strong> 60
           </div>
         </div>
       </div>
@@ -52,13 +52,13 @@ const StatsCards = () => {
     <div className="stats-card card-active h-100">
       <div className="card-content">
         <div className="card-label">DM Approval</div>
-        <div className="card-value">62</div>
+        <div className="card-value">60</div>
         <div className="breakdown">
           <div>
             <strong>Today:</strong> 10
           </div>
           <div>
-            <strong>Yesterday:</strong> 12
+            <strong>Yesterday:</strong> 10
           </div>
           <div>
             <strong>Last week:</strong> 40
@@ -74,16 +74,16 @@ const StatsCards = () => {
     <div className="stats-card card-closed h-100">
       <div className="card-content">
         <div className="card-label">Fund Enhancement</div>
-        <div className="card-value">62</div>
+        <div className="card-value">50</div>
         <div className="breakdown">
           <div>
             <strong>Today:</strong> 10
           </div>
           <div>
-            <strong>Yesterday:</strong> 12
+            <strong>Yesterday:</strong> 10
           </div>
           <div>
-            <strong>Last week:</strong> 40
+            <strong>Last week:</strong> 30
           </div>
         </div>
       </div>
