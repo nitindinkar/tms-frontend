@@ -459,6 +459,7 @@ body {
     margin-bottom: 1rem;
 }
 
+
 /* Success Message */
 .success-icon {
     font-size: 4rem;
@@ -610,6 +611,9 @@ body {
 }
 
 /* Photo preview */
+.camera-view .photo-preview, .captured-photo-section .photo-preview{
+    margin-top: 2rem;
+}
 .photo-preview {
     height: 270px; 
     border: 1px solid #dee2e6;

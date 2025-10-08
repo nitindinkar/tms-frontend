@@ -312,7 +312,7 @@ const GenerateTidModal = ({
             <div className="row">
               <div className="col-md-4">
                 <label className="form-label">
-                  RTA Accidental Case <span className="text-danger">*</span>
+                Road Traffic Accident (RTA) Case <span className="text-danger">*</span>
                 </label>
                 <div className="single-select-group">
                   <div className="form-check">

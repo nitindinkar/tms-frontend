@@ -35,8 +35,8 @@ const Sidebar = ({ collapsed, toggleSidebar }) => {
           </li>
           <li className="nav-item">
             <NavLink 
-              to="/pre-authorization" 
-              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+              // to="/pre-authorization" 
+              className={({ isActive }) => `nav-link ${isActive ? 'actived' : ''}`}
             >
               <i className="bi bi-file-medical"></i> <span>Pre Authorization</span>
             </NavLink>
