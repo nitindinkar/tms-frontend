@@ -12,14 +12,54 @@ const GenerateTidModal = ({
 }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [verifyMethod, setVerifyMethod] = useState("aadhaar");
-  const [admissionType, setAdmissionType] = useState("normal");
-  const [hasJanAadhaar, setHasJanAadhaar] = useState(true);
   const [isMlcCase, setIsMlcCase] = useState(false);
   const [isPatientIdentified, setIsPatientIdentified] = useState(false);
-  const [rtaCase, setRtaCase] = useState("no");
   const [gender, setGender] = useState("male");
   const [skipStep2, setSkipStep2] = useState(false);
   const [skipStep3, setSkipStep3] = useState(false);
+
+  const [formData, setFormData] = useState({
+    rtaCase: "no",
+    admissionType: "normal",
+    hasJanAadhaar: true,
+    patientName: "",
+    patientAge: "",
+    gender: "",
+    isMlcCase: false,
+    assaultType: "",
+    isPatientIdentified: false,
+    identifierName: "",
+    identifierRelation: "",
+    identifierContact: "",
+    identityType: "",
+    identityNumber: "",
+    entitlementType: "",
+    rationCard: "",
+    mobileNo: "",
+    houseNumber: "",
+    street: "",
+    block: "",
+    gramPanchayat: "",
+    village: "",
+    tehsil: "",
+    district: "",
+    stateName: "",
+    pincode: "",
+    bhamashaId: "",
+    janAadhaarId: "",
+    memberName: "",
+    memberAge: "",
+    memberGender: "",
+    memberRelation: "",
+    memberId: "",
+    photo: null,
+  });
+  console.log("Form Data:", formData);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+  // const handleSingleSelect = (key, value) => setFormData({ ...formData, [key]: value });
 
   // Camera states using your working logic
   const videoRef = useRef(null);
@@ -157,11 +197,11 @@ const GenerateTidModal = ({
   useEffect(() => {
     if (!show) {
       setCurrentStep(1);
-      setAdmissionType("normal");
-      setHasJanAadhaar(true);
+      // setAdmissionType("normal");
+      // setHasJanAadhaar(true);
       setIsMlcCase(false);
       setIsPatientIdentified(false);
-      setRtaCase("no");
+      // setRtaCase("no");
       setVerifyMethod("aadhaar");
       setSkipStep2(false);
       setSkipStep3(false);
@@ -170,21 +210,23 @@ const GenerateTidModal = ({
 
   // Update skipStep2 and skipStep3 based on admission type and Jan Aadhaar
   useEffect(() => {
-    if (admissionType === "normal") {
+    if (formData.admissionType === "normal") {
       // For normal admission: skip step 2 only if no Jan Aadhaar
-      setSkipStep2(!hasJanAadhaar);
+      setSkipStep2(!formData.hasJanAadhaar);
       setSkipStep3(false);
-    } else if (admissionType === "emergency") {
+    } else if (formData.admissionType === "emergency") {
       // For emergency admission: skip both step 2 and step 3
       setSkipStep2(true);
       setSkipStep3(true);
     }
-  }, [hasJanAadhaar, admissionType]);
+  }, [formData?.hasJanAadhaar, formData.admissionType]);
 
   // Single select handler for checkbox groups
-  const handleSingleSelect = (setter, value, groupName) => {
-    setter(value);
-    console.log(`Selected ${value} for ${groupName}`);
+  const handleSingleSelect = (fieldName, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      [fieldName]: value,
+    }));
   };
 
   const nextStep = () => {
@@ -232,7 +274,7 @@ const GenerateTidModal = ({
   };
 
   const generateTid = () => {
-    handleClose();
+    clearStates();
     showSuccess();
   };
 
@@ -312,19 +354,18 @@ const GenerateTidModal = ({
             <div className="row">
               <div className="col-md-4">
                 <label className="form-label">
-                Road Traffic Accident (RTA) Case <span className="text-danger">*</span>
+                  Road Traffic Accident (RTA) Case{" "}
+                  <span className="text-danger">*</span>
                 </label>
                 <div className="single-select-group">
                   <div className="form-check">
                     <input
                       className="form-check-input single-select"
                       type="checkbox"
-                      name="rta-case"
+                      name="rtaCase"
                       id="rta-no"
-                      checked={rtaCase === "no"}
-                      onChange={() =>
-                        handleSingleSelect(setRtaCase, "no", "rta-case")
-                      }
+                      checked={formData.rtaCase === "no"}
+                      onChange={() => handleSingleSelect("rtaCase", "no")}
                     />
                     <label className="form-check-label" htmlFor="rta-no">
                       No
@@ -334,12 +375,10 @@ const GenerateTidModal = ({
                     <input
                       className="form-check-input single-select"
                       type="checkbox"
-                      name="rta-case"
+                      name="rtaCase"
                       id="rta-yes"
-                      checked={rtaCase === "yes"}
-                      onChange={() =>
-                        handleSingleSelect(setRtaCase, "yes", "rta-case")
-                      }
+                      checked={formData.rtaCase === "yes"}
+                      onChange={() => handleSingleSelect("rtaCase", "yes")}
                     />
                     <label className="form-check-label" htmlFor="rta-yes">
                       Yes
@@ -356,15 +395,11 @@ const GenerateTidModal = ({
                     <input
                       className="form-check-input single-select"
                       type="checkbox"
-                      name="admission-type"
+                      name="admissionType"
                       id="admission-normal"
-                      checked={admissionType === "normal"}
+                      checked={formData.admissionType === "normal"}
                       onChange={() =>
-                        handleSingleSelect(
-                          setAdmissionType,
-                          "normal",
-                          "admission-type"
-                        )
+                        handleSingleSelect("admissionType", "normal")
                       }
                     />
                     <label
@@ -378,15 +413,11 @@ const GenerateTidModal = ({
                     <input
                       className="form-check-input single-select"
                       type="checkbox"
-                      name="admission-type"
+                      name="admissionType"
                       id="admission-emergency"
-                      checked={admissionType === "emergency"}
+                      checked={formData.admissionType === "emergency"}
                       onChange={() =>
-                        handleSingleSelect(
-                          setAdmissionType,
-                          "emergency",
-                          "admission-type"
-                        )
+                        handleSingleSelect("admissionType", "emergency")
                       }
                     />
                     <label
@@ -398,7 +429,7 @@ const GenerateTidModal = ({
                   </div>
                 </div>
               </div>
-              {admissionType === "normal" && (
+              {formData.admissionType === "normal" && (
                 <div className="col-md-4">
                   <label className="form-label">
                     Do you have Jan Aadhaar ID?{" "}
@@ -409,15 +440,11 @@ const GenerateTidModal = ({
                       <input
                         className="form-check-input single-select"
                         type="checkbox"
-                        name="jan-aadhaar"
+                        name="hasJanAadhaar"
                         id="jan-yes"
-                        checked={hasJanAadhaar === true}
+                        checked={formData?.hasJanAadhaar === true}
                         onChange={() =>
-                          handleSingleSelect(
-                            setHasJanAadhaar,
-                            true,
-                            "jan-aadhaar"
-                          )
+                          handleSingleSelect("hasJanAadhaar", true)
                         }
                       />
                       <label className="form-check-label" htmlFor="jan-yes">
@@ -428,15 +455,11 @@ const GenerateTidModal = ({
                       <input
                         className="form-check-input single-select"
                         type="checkbox"
-                        name="jan-aadhaar"
+                        name="hasJanAadhaar"
                         id="jan-no"
-                        checked={hasJanAadhaar === false}
+                        checked={formData?.hasJanAadhaar === false}
                         onChange={() =>
-                          handleSingleSelect(
-                            setHasJanAadhaar,
-                            false,
-                            "jan-aadhaar"
-                          )
+                          handleSingleSelect("hasJanAadhaar", false)
                         }
                       />
                       <label className="form-check-label" htmlFor="jan-no">
@@ -444,7 +467,7 @@ const GenerateTidModal = ({
                       </label>
                     </div>
                   </div>
-                  {!hasJanAadhaar && (
+                  {!formData?.hasJanAadhaar && (
                     <div className="alert alert-info mt-2 small">
                       <i className="bi bi-info-circle"></i> Step 2 will be
                       skipped as you don't have Jan Aadhaar ID.
@@ -455,7 +478,7 @@ const GenerateTidModal = ({
             </div>
 
             {/* Emergency Form - Conditionally Rendered */}
-            {admissionType === "emergency" && (
+            {formData.admissionType === "emergency" && (
               <div
                 id="emergency-form"
                 className="emergency-form p-3 border rounded"
@@ -686,7 +709,7 @@ const GenerateTidModal = ({
             )}
 
             {/* Identity Details - Conditionally Shown */}
-            {hasJanAadhaar && admissionType === "normal" && (
+            {formData?.hasJanAadhaar && formData.admissionType === "normal" && (
               <div className="row">
                 <div className="col-md-4 mb-2">
                   <label className="form-label">
@@ -789,7 +812,7 @@ const GenerateTidModal = ({
 
         {currentStep === 3 && (
           <div className="tab-pane fade show active">
-            {hasJanAadhaar && (
+            {formData?.hasJanAadhaar && (
               <>
                 <h4 className="step-heading">Member Details of Beneficiary</h4>
                 {/* Verify By Field */}
@@ -1103,273 +1126,314 @@ const GenerateTidModal = ({
             )}
 
             {/* Instant Beneficiary Form - Conditionally Rendered */}
-            {!hasJanAadhaar && admissionType === "normal" && (
-              <div id="instant-beneficiary-form">
-                <h5 className="step-heading">Instant Beneficiary Details</h5>
+            {!formData?.hasJanAadhaar &&
+              formData.admissionType === "normal" && (
+                <div id="instant-beneficiary-form">
+                  <h5 className="step-heading">Instant Beneficiary Details</h5>
 
-                <div className="row">
-                  <div className="col-md-4 mb-2">
-                    <label className="form-label">
-                      Patient Name <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Enter patient name"
-                    />
-                  </div>
-
-                  <div className="col-md-4 mb-2">
-                    <label className="form-label">Age</label>
-                    <input
-                      type="number"
-                      className="form-control"
-                      placeholder="Age"
-                    />
-                  </div>
-
-                  <div className="col-md-4 mb-2">
-                    <label className="form-label">
-                      Gender <span className="text-danger">*</span>
-                    </label>
-                    <div className="single-select-group">
-                      <div className="form-check">
-                        <input
-                          className="form-check-input single-select"
-                          type="checkbox"
-                          name="instant-gender"
-                          id="instant-gender-male"
-                          checked={gender === "male"}
-                          onChange={() =>
-                            handleSingleSelect(setGender, "male", "gender")
-                          }
-                        />
-                        <label
-                          className="form-check-label"
-                          htmlFor="instant-gender-male"
-                        >
-                          Male
-                        </label>
-                      </div>
-                      <div className="form-check">
-                        <input
-                          className="form-check-input single-select"
-                          type="checkbox"
-                          name="instant-gender"
-                          id="instant-gender-female"
-                          checked={gender === "female"}
-                          onChange={() =>
-                            handleSingleSelect(setGender, "female", "gender")
-                          }
-                        />
-                        <label
-                          className="form-check-label"
-                          htmlFor="instant-gender-female"
-                        >
-                          Female
-                        </label>
-                      </div>
+                  <div className="row">
+                    <div className="col-md-4 mb-2">
+                      <label className="form-label">
+                        Patient Name <span className="text-danger">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Enter patient name"
+                      />
                     </div>
-                  </div>
 
-                  <div className="col-md-4 mb-2">
-                    <label className="form-label">Mobile No</label>
-                    <input
-                      type="tel"
-                      className="form-control"
-                      placeholder="Enter mobile number"
-                    />
-                  </div>
-
-                  <div className="col-md-4 mb-2">
-                    <label className="form-label">House No</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Enter house number"
-                    />
-                  </div>
-
-                  <div className="col-md-4 mb-2">
-                    <label className="form-label">Colony/Street</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Enter colony/street"
-                    />
-                  </div>
-
-                  <div className="col-md-4 mb-2">
-                    <label className="form-label">Block/Ward</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Enter block/ward"
-                    />
-                  </div>
-
-                  <div className="col-md-4 mb-2">
-                    <label className="form-label">Village</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Enter village"
-                    />
-                  </div>
-
-                  <div className="col-md-4 mb-2">
-                    <label className="form-label">Tehsil</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Enter tehsil"
-                    />
-                  </div>
-
-                  <div className="col-md-6 mb-2">
-                    <label className="form-label">
-                      Incident District <span className="text-danger">*</span>
-                    </label>
-                    <select className="form-select">
-                      <option value="">- Select -</option>
-                      <option value="district1">District 1</option>
-                      <option value="district2">District 2</option>
-                      <option value="district3">District 3</option>
-                    </select>
-                  </div>
-
-                  <div className="col-md-6 mb-2">
-                    <label className="form-label">Pin Code</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Enter pin code"
-                    />
-                  </div>
-
-                  <div className="col-md-6 mb-2">
-                    <label className="form-label">
-                      Residence State <span className="text-danger">*</span>
-                    </label>
-                    <select className="form-select">
-                      <option value="">- Select -</option>
-                      <option value="state1">State 1</option>
-                      <option value="state2">State 2</option>
-                      <option value="state3">State 3</option>
-                    </select>
-                  </div>
-
-                  <div className="col-md-6 mb-2">
-                    <label className="form-label">
-                      Residence District <span className="text-danger">*</span>
-                    </label>
-                    <select className="form-select">
-                      <option value="">- Select -</option>
-                      <option value="district1">District 1</option>
-                      <option value="district2">District 2</option>
-                      <option value="district3">District 3</option>
-                    </select>
-                  </div>
-                </div>
-
-                {/* Verification Section */}
-                <div className="row">
-                  <div className="col-md-6">
-                    <label className="form-label">Verification By</label>
-                    <div className="single-select-group">
-                      <div className="form-check">
-                        <input
-                          className="form-check-input single-select"
-                          type="checkbox"
-                          name="verification-by"
-                          id="verification-aadhaar"
-                          checked={verifyMethod === "aadhaar"}
-                          onChange={() =>
-                            handleSingleSelect(
-                              setVerifyMethod,
-                              "aadhaar",
-                              "verify-by"
-                            )
-                          }
-                        />
-                        <label
-                          className="form-check-label"
-                          htmlFor="verification-aadhaar"
-                        >
-                          Aadhaar
-                        </label>
-                      </div>
-                      <div className="form-check">
-                        <input
-                          className="form-check-input single-select"
-                          type="checkbox"
-                          name="verification-by"
-                          id="verification-moic"
-                          checked={verifyMethod === "moic"}
-                          onChange={() =>
-                            handleSingleSelect(
-                              setVerifyMethod,
-                              "moic",
-                              "verify-by"
-                            )
-                          }
-                        />
-                        <label
-                          className="form-check-label"
-                          htmlFor="verification-moic"
-                        >
-                          Medical Officer In Charge (MOIC)
-                        </label>
-                      </div>
+                    <div className="col-md-4 mb-2">
+                      <label className="form-label">Age</label>
+                      <input
+                        type="number"
+                        className="form-control"
+                        placeholder="Age"
+                      />
                     </div>
-                  </div>
-                </div>
 
-                {/* Aadhaar Case Conditionally Rendered */}
-                {verifyMethod === "aadhaar" && (
-                  <div
-                    id="moic-doc-upload"
-                    className="moic-doc-upload m-0 p-3 border rounded "
-                  >
-                    <div className="row">
-                      <div className="col-md-12 mb-2">
-                        <label className="form-label">Aadhaar No</label>
-                        <div className="d-flex align-items-center">
+                    <div className="col-md-4 mb-2">
+                      <label className="form-label">
+                        Gender <span className="text-danger">*</span>
+                      </label>
+                      <div className="single-select-group">
+                        <div className="form-check">
                           <input
-                            type="text"
-                            className="form-control me-2"
-                            placeholder="Aadhaar number"
+                            className="form-check-input single-select"
+                            type="checkbox"
+                            name="instant-gender"
+                            id="instant-gender-male"
+                            checked={gender === "male"}
+                            onChange={() =>
+                              handleSingleSelect(setGender, "male", "gender")
+                            }
                           />
                           <label
-                            className="form-check-label small"
-                            htmlFor="aadhaar-not-verified"
+                            className="form-check-label"
+                            htmlFor="instant-gender-male"
                           >
-                            Not Verified
+                            Male
+                          </label>
+                        </div>
+                        <div className="form-check">
+                          <input
+                            className="form-check-input single-select"
+                            type="checkbox"
+                            name="instant-gender"
+                            id="instant-gender-female"
+                            checked={gender === "female"}
+                            onChange={() =>
+                              handleSingleSelect(setGender, "female", "gender")
+                            }
+                          />
+                          <label
+                            className="form-check-label"
+                            htmlFor="instant-gender-female"
+                          >
+                            Female
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="col-md-4 mb-2">
+                      <label className="form-label">Mobile No</label>
+                      <input
+                        type="tel"
+                        className="form-control"
+                        placeholder="Enter mobile number"
+                      />
+                    </div>
+
+                    <div className="col-md-4 mb-2">
+                      <label className="form-label">House No</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Enter house number"
+                      />
+                    </div>
+
+                    <div className="col-md-4 mb-2">
+                      <label className="form-label">Colony/Street</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Enter colony/street"
+                      />
+                    </div>
+
+                    <div className="col-md-4 mb-2">
+                      <label className="form-label">Block/Ward</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Enter block/ward"
+                      />
+                    </div>
+
+                    <div className="col-md-4 mb-2">
+                      <label className="form-label">Village</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Enter village"
+                      />
+                    </div>
+
+                    <div className="col-md-4 mb-2">
+                      <label className="form-label">Tehsil</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Enter tehsil"
+                      />
+                    </div>
+
+                    <div className="col-md-6 mb-2">
+                      <label className="form-label">
+                        Incident District <span className="text-danger">*</span>
+                      </label>
+                      <select className="form-select">
+                        <option value="">- Select -</option>
+                        <option value="district1">District 1</option>
+                        <option value="district2">District 2</option>
+                        <option value="district3">District 3</option>
+                      </select>
+                    </div>
+
+                    <div className="col-md-6 mb-2">
+                      <label className="form-label">Pin Code</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Enter pin code"
+                      />
+                    </div>
+
+                    <div className="col-md-6 mb-2">
+                      <label className="form-label">
+                        Residence State <span className="text-danger">*</span>
+                      </label>
+                      <select className="form-select">
+                        <option value="">- Select -</option>
+                        <option value="state1">State 1</option>
+                        <option value="state2">State 2</option>
+                        <option value="state3">State 3</option>
+                      </select>
+                    </div>
+
+                    <div className="col-md-6 mb-2">
+                      <label className="form-label">
+                        Residence District{" "}
+                        <span className="text-danger">*</span>
+                      </label>
+                      <select className="form-select">
+                        <option value="">- Select -</option>
+                        <option value="district1">District 1</option>
+                        <option value="district2">District 2</option>
+                        <option value="district3">District 3</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Verification Section */}
+                  <div className="row">
+                    <div className="col-md-6">
+                      <label className="form-label">Verification By</label>
+                      <div className="single-select-group">
+                        <div className="form-check">
+                          <input
+                            className="form-check-input single-select"
+                            type="checkbox"
+                            name="verification-by"
+                            id="verification-aadhaar"
+                            checked={verifyMethod === "aadhaar"}
+                            onChange={() =>
+                              handleSingleSelect(
+                                setVerifyMethod,
+                                "aadhaar",
+                                "verify-by"
+                              )
+                            }
+                          />
+                          <label
+                            className="form-check-label"
+                            htmlFor="verification-aadhaar"
+                          >
+                            Aadhaar
+                          </label>
+                        </div>
+                        <div className="form-check">
+                          <input
+                            className="form-check-input single-select"
+                            type="checkbox"
+                            name="verification-by"
+                            id="verification-moic"
+                            checked={verifyMethod === "moic"}
+                            onChange={() =>
+                              handleSingleSelect(
+                                setVerifyMethod,
+                                "moic",
+                                "verify-by"
+                              )
+                            }
+                          />
+                          <label
+                            className="form-check-label"
+                            htmlFor="verification-moic"
+                          >
+                            Medical Officer In Charge (MOIC)
                           </label>
                         </div>
                       </div>
                     </div>
                   </div>
-                )}
-                {/* MOIC Document Upload Field - Conditionally Rendered */}
-                {verifyMethod === "moic" && (
-                  <div
-                    id="moic-doc-upload"
-                    className="moic-doc-upload mt-3 p-3 border rounded "
-                  >
-                    <div className="row">
+
+                  {/* Aadhaar Case Conditionally Rendered */}
+                  {verifyMethod === "aadhaar" && (
+                    <div
+                      id="moic-doc-upload"
+                      className="moic-doc-upload m-0 p-3 border rounded "
+                    >
+                      <div className="row">
+                        <div className="col-md-12 mb-2">
+                          <label className="form-label">Aadhaar No</label>
+                          <div className="d-flex align-items-center">
+                            <input
+                              type="text"
+                              className="form-control me-2"
+                              placeholder="Aadhaar number"
+                            />
+                            <label
+                              className="form-check-label small"
+                              htmlFor="aadhaar-not-verified"
+                            >
+                              Not Verified
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  {/* MOIC Document Upload Field - Conditionally Rendered */}
+                  {verifyMethod === "moic" && (
+                    <div
+                      id="moic-doc-upload"
+                      className="moic-doc-upload mt-3 p-3 border rounded "
+                    >
+                      <div className="row">
+                        <div className="col-md-10">
+                          <label className="form-label">
+                            Upload MOIC Approved Document{" "}
+                            <span className="text-danger">*</span>
+                          </label>
+                          <input
+                            type="file"
+                            className="form-control"
+                            accept=".pdf,.jpg,.jpeg,.png"
+                          />
+                          <small className="text-muted">
+                            Accepted formats: PDF, JPG, JPEG, PNG
+                          </small>
+                        </div>
+                        <div className="col-md-2">
+                          <label className="form-label d-block">&nbsp;</label>
+                          <button className="btn btn-success btn-sm me-2">
+                            Upload
+                          </button>
+                          <button className="btn btn-secondary btn-sm">
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Instant Approval Document Section */}
+                  <div className="instant-approval-section mt-3 p-3 border rounded bg-light">
+                    <h5 className="mb-3">Instant Approval Document</h5>
+                    <p className="small text-muted mb-3">
+                      Citizen is not enrolled with MAA Yojana. In case of
+                      Emergency, an approval request form document can be
+                      uploaded and after approval from concerned District
+                      Collector or Govt. Hospitality and Medical Department (in
+                      case of Govt. hospital), citizen can avail benefits.
+                    </p>
+
+                    <div className="row mb-3">
                       <div className="col-md-10">
                         <label className="form-label">
-                          Upload MOIC Approved Document{" "}
-                          <span className="text-danger">*</span>
+                          Upload Approval Document (Only PDF file, not more than
+                          500 KB, is allowed)
                         </label>
                         <input
                           type="file"
                           className="form-control"
-                          accept=".pdf,.jpg,.jpeg,.png"
+                          accept=".pdf"
                         />
                         <small className="text-muted">
-                          Accepted formats: PDF, JPG, JPEG, PNG
+                          Maximum file size: 500 KB
                         </small>
                       </div>
                       <div className="col-md-2">
@@ -1383,47 +1447,8 @@ const GenerateTidModal = ({
                       </div>
                     </div>
                   </div>
-                )}
-
-                {/* Instant Approval Document Section */}
-                <div className="instant-approval-section mt-3 p-3 border rounded bg-light">
-                  <h5 className="mb-3">Instant Approval Document</h5>
-                  <p className="small text-muted mb-3">
-                    Citizen is not enrolled with MAA Yojana. In case of
-                    Emergency, an approval request form document can be uploaded
-                    and after approval from concerned District Collector or
-                    Govt. Hospitality and Medical Department (in case of Govt.
-                    hospital), citizen can avail benefits.
-                  </p>
-
-                  <div className="row mb-3">
-                    <div className="col-md-10">
-                      <label className="form-label">
-                        Upload Approval Document (Only PDF file, not more than
-                        500 KB, is allowed)
-                      </label>
-                      <input
-                        type="file"
-                        className="form-control"
-                        accept=".pdf"
-                      />
-                      <small className="text-muted">
-                        Maximum file size: 500 KB
-                      </small>
-                    </div>
-                    <div className="col-md-2">
-                      <label className="form-label d-block">&nbsp;</label>
-                      <button className="btn btn-success btn-sm me-2">
-                        Upload
-                      </button>
-                      <button className="btn btn-secondary btn-sm">
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
                 </div>
-              </div>
-            )}
+              )}
           </div>
         )}
 
