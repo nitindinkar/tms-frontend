@@ -33,7 +33,7 @@ const Sidebar = ({ collapsed, toggleSidebar }) => {
 
           <li className="nav-item">
             <NavLink to="/pre-authorization" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-              <i className="bi bi-file-earmark-medical"></i> <span>Pre Authorization Request</span>
+              <i className="bi bi-file-earmark-medical"></i> <span>Pre-Auth Request</span>
             </NavLink>
           </li>
 
@@ -45,7 +45,7 @@ const Sidebar = ({ collapsed, toggleSidebar }) => {
 
           <li className="nav-item">
             <NavLink to="/pre-authorization-decision" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-              <i className="bi bi-clipboard2-check"></i> <span>Pre Authorization Decision</span>
+              <i className="bi bi-clipboard2-check"></i> <span>Pre-Auth Decision</span>
             </NavLink>
           </li>
 
@@ -57,13 +57,13 @@ const Sidebar = ({ collapsed, toggleSidebar }) => {
 
           <li className="nav-item">
             <NavLink to="/preauth-decision-enhancement" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-              <i className="bi bi-arrow-up-circle"></i> <span>Pre Authorization Decision Enhancement</span>
+              <i className="bi bi-arrow-up-circle"></i> <span>Pre-Auth Decision Enhancement</span>
             </NavLink>
           </li>
 
           <li className="nav-item">
             <NavLink to="/patient-discharge-claim" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-              <i className="bi bi-journal-medical"></i> <span>Patient Discharge & Claim Submission</span>
+              <i className="bi bi-journal-medical"></i> <span>Patient Discharge & Claim</span>
             </NavLink>
           </li>
 

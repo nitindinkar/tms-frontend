@@ -88,6 +88,49 @@ body {
 }
 
 
+/* Global font scaling variable */
+:root {
+    --global-font-scale: 1;
+  }
+  
+  /* Apply scaling ONLY to the main content area */
+  .main-content {
+    font-size: calc(1rem * var(--global-font-scale));
+  }
+  
+  /* Scale heading sizes proportionally inside main content */
+  .main-content h1, .modal-content h1 { font-size: calc(1.7rem * var(--global-font-scale)); }
+  .main-content h2, .modal-content h2 { font-size: calc(1.5rem * var(--global-font-scale)); }
+  .main-content h3, .modal-content h3 { font-size: calc(1.75rem * var(--global-font-scale)); }
+  .main-content h4, .modal-content h4 { font-size: calc(1.5rem * var(--global-font-scale)); }
+  .main-content h5, .modal-content h5 { font-size: calc(1.25rem * var(--global-font-scale)); }
+  .main-content h6, .modal-content h6 { font-size: calc(1rem * var(--global-font-scale)); }
+
+  .main-content p, .main-content span, .main-content a, .main-content li, .main-content label, .main-content button, .main-content input, textarea { 
+    font-size: calc(1rem * var(--global-font-scale));
+   }
+
+   /* Scale text inside modal */
+.modal-content p,
+.modal-content span,
+.modal-content a,
+.modal-content li,
+.modal-content label,
+.modal-content button,
+.modal-content input,
+.modal-content textarea {
+  font-size: calc(1rem * var(--global-font-scale));
+}
+
+  /* Ensure header and sidebar are unaffected */
+  .header-container,
+  .sidebar {
+    font-size: initial !important;
+  }
+  
+
+
+
 
 /* Custom styles for the header */
   
@@ -169,7 +212,7 @@ body {
 
 .sidebar .nav-link {
     color: var(--light-bg);
-    padding: 0.75rem .75rem;
+    padding: 0.6rem .85rem;
     border-left: 3px solid transparent;
     white-space: normal;
     word-wrap: break-word;

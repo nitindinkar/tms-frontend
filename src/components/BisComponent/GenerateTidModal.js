@@ -1478,8 +1478,8 @@ const GenerateTidModal = ({
         {currentStep === 4 && (
           <div className="tab-pane fade show active">
             <h4 className="step-heading">
-              Capture Patient's Photograph or upload Patient's Photograph in
-              jpg/jpeg/png/gif/bmp format
+              Capture Patient's Photograph or Upload Patient's Photograph in
+              jpg/jpeg/png/gif/bmp Format
             </h4>
             <div className="row">
               <div className="col-md-6">

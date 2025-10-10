@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Dropdown from 'react-bootstrap/Dropdown';
@@ -8,11 +8,29 @@ import logo from '../../assets/logo.png';
 
 const Header = ({ toggleSidebar, sidebarCollapsed }) => {
   const navigate = useNavigate();
+  const [fontScale, setFontScale] = useState(1); // 1 = 100%
+
+  useEffect(() => {
+    document.documentElement.style.setProperty('--global-font-scale', fontScale);
+  }, [fontScale]);
 
   const handleLogout = () => {
-    localStorage.clear(); 
+    localStorage.clear();
     sessionStorage.clear();
     navigate('/');
+  };
+
+  // Each click = ±5% (0.05)
+  const increaseFont = () => {
+    if (fontScale < 1.1) {
+      setFontScale(prev => parseFloat((prev + 0.05).toFixed(2)));
+    }
+  };
+
+  const decreaseFont = () => {
+    if (fontScale > 0.9) {
+      setFontScale(prev => parseFloat((prev - 0.05).toFixed(2)));
+    }
   };
 
   return (
@@ -34,8 +52,22 @@ const Header = ({ toggleSidebar, sidebarCollapsed }) => {
         <div className="d-flex align-items-center gap-3">
           {/* Font size controls */}
           <div className="d-flex align-items-center gap-1 accessibility">
-            <button className="btn btn-outline-secondary btn-sm">A−</button>
-            <button className="btn btn-outline-secondary btn-sm">A+</button>
+            <button
+              className="btn btn-outline-secondary btn-sm"
+              onClick={decreaseFont}
+              disabled={fontScale <= 0.9}
+              title="Decrease font size"
+            >
+              A−
+            </button>
+            <button
+              className="btn btn-outline-secondary btn-sm"
+              onClick={increaseFont}
+              disabled={fontScale >= 1.1}
+              title="Increase font size"
+            >
+              A+
+            </button>
           </div>
 
           {/* User Profile Dropdown */}
