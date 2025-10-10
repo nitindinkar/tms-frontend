@@ -17,7 +17,7 @@ const GenerateTidModal = ({
   const [gender, setGender] = useState("male");
   const [skipStep2, setSkipStep2] = useState(false);
   const [skipStep3, setSkipStep3] = useState(false);
-
+  const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({
     rtaCase: "no",
     admissionType: "normal",
@@ -715,23 +715,46 @@ const GenerateTidModal = ({
                   <label className="form-label">
                     Identity Type <span className="text-danger">*</span>
                   </label>
-                  <select className="form-select">
-                    <option>Select Identity Type</option>
-                    <option>Aadhaar Card</option>
-                    <option>Driving License</option>
-                    <option>Voter ID</option>
-                    <option>PAN Card</option>
+                  <select
+                    className={`form-select ${
+                      errors.identityType ? "is-invalid" : ""
+                    }`}
+                    name="identityType"
+                    value={formData.identityType}
+                    onChange={handleChange}
+                  >
+                    <option value="">Select Identity Type</option>
+                    <option value="aadhaar">Aadhaar Card</option>
+                    <option value="driving">Driving License</option>
+                    <option value="voter">Voter ID</option>
+                    <option value="pan">PAN Card</option>
                   </select>
+                  {errors.identityType && (
+                    <div className="invalid-feedback">
+                      {errors.identityType}
+                    </div>
+                  )}
                 </div>
+
                 <div className="col-md-4 mb-2">
                   <label className="form-label">
                     Identity Number <span className="text-danger">*</span>
                   </label>
                   <input
                     type="text"
-                    className="form-control"
+                    className={`form-control ${
+                      errors.identityNumber ? "is-invalid" : ""
+                    }`}
+                    name="identityNumber"
+                    value={formData.identityNumber}
+                    onChange={handleChange}
                     placeholder="Enter Identity Number"
                   />
+                  {errors.identityNumber && (
+                    <div className="invalid-feedback">
+                      {errors.identityNumber}
+                    </div>
+                  )}
                 </div>
               </div>
             )}
