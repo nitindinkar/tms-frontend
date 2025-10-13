@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Table, Form, Button, Row, Col, Dropdown } from "react-bootstrap";
+import Badge from "react-bootstrap/Badge";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "animate.css";
 import Swal from "sweetalert2";
@@ -37,9 +38,17 @@ const PreAuthFormModal = ({ show, handleClose }) => {
   // Mock data for packages
   const [packages, setPackages] = useState([]);
   const [specialties, setSpecialties] = useState([
-    "Cardiology", "Neurology", "Orthopedics", "General Surgery", 
-    "Pediatrics", "Gynecology", "Ophthalmology", "ENT"
+    "Cardiology", 
+    "Neurology", 
+    "Orthopedics", 
+    "General",
+    "General Surgery", 
+    "Pediatrics", 
+    "Gynecology", 
+    "Ophthalmology", 
+    "ENT"
   ]);
+  
 
   // Search states
   const [specialtySearch, setSpecialtySearch] = useState("");
@@ -102,14 +111,20 @@ const PreAuthFormModal = ({ show, handleClose }) => {
   useEffect(() => {
     // Simulate API call to get packages
     const mockPackages = [
-      { id: 1, code: "PKG001", name: "Cardiac Bypass Surgery", category: "Tertiary", rate: 150000, bookedAmount:150000, specialty: "Cardiology" },
-      { id: 2, code: "PKG002", name: "Knee Replacement", category: "Secondary", rate: 80000, bookedAmount:80000, specialty: "Orthopedics" },
-      { id: 3, code: "PKG003", name: "Cataract Surgery", category: "Secondary", rate: 15000, bookedAmount:15000, specialty: "Ophthalmology" },
-      { id: 4, code: "PKG004", name: "Neuro Surgery", category: "Tertiary", rate: 200000, bookedAmount:200000, specialty: "Neurology" },
-      { id: 5, code: "PKG005", name: "Normal Delivery", category: "Secondary", rate: 10000, bookedAmount:10000, specialty: "Gynecology" },
-      { id: 6, code: "PKG006", name: "C-Section", category: "Secondary", rate: 20000, bookedAmount:20000, specialty: "Gynecology" },
-      { id: 7, code: "PKG007", name: "Appendectomy", category: "Secondary", rate: 25000, bookedAmount:25000, specialty: "General Surgery" },
-      { id: 8, code: "PKG008", name: "Heart Valve Replacement", category: "Tertiary", rate: 180000, bookedAmount:180000, specialty: "Cardiology" }
+      { id: 1, code: "PKG001", name: "Cardiac Bypass Surgery", category: "Tertiary", rate: 150000, bookedAmount: 150000, specialty: "Cardiology", isSurgical: true },
+      { id: 2, code: "PKG002", name: "Knee Replacement", category: "Secondary", rate: 80000, bookedAmount: 80000, specialty: "Orthopedics", isSurgical: true },
+      { id: 3, code: "PKG003", name: "Cataract Surgery", category: "Secondary", rate: 15000, bookedAmount: 15000, specialty: "Ophthalmology", isSurgical: true },
+      { id: 4, code: "PKG004", name: "Neuro Surgery", category: "Tertiary", rate: 200000, bookedAmount: 200000, specialty: "Neurology", isSurgical: true },
+      { id: 5, code: "PKG005", name: "Normal Delivery", category: "Secondary", rate: 10000, bookedAmount: 10000, specialty: "Gynecology", isSurgical: true },
+      { id: 6, code: "PKG006", name: "C-Section", category: "Secondary", rate: 20000, bookedAmount: 20000, specialty: "Gynecology", isSurgical: true },
+      { id: 7, code: "PKG007", name: "Appendectomy", category: "Secondary", rate: 25000, bookedAmount: 25000, specialty: "General Surgery", isSurgical: true },
+      { id: 8, code: "PKG008", name: "Heart Valve Replacement", category: "Tertiary", rate: 180000, bookedAmount: 180000, specialty: "Cardiology", isSurgical: true },
+      { id: 9, code: "PKG009", name: "Gallbladder Removal", category: "Secondary", rate: 30000, bookedAmount: 30000, specialty: "General Surgery", isSurgical: true },
+      { id: 10, code: "PKG010", name: "Spinal Fusion Surgery", category: "Tertiary", rate: 220000, bookedAmount: 220000, specialty: "Orthopedics", isSurgical: true },
+      { id: 11, code: "PKG011", name: "Hernia Repair Surgery", category: "Secondary", rate: 18000, bookedAmount: 18000, specialty: "General Surgery", isSurgical: true },
+      { id: 12, code: "PKG012", name: "Coronary Angioplasty", category: "Tertiary", rate: 120000, bookedAmount: 120000, specialty: "Cardiology", isSurgical: true },
+      { id: 13, code: "PKG013", name: "Consultation Package", category: "Primary", rate: 5000, bookedAmount: 5000, specialty: "General", isSurgical: false },
+      { id: 14, code: "PKG014", name: "Diagnostic Tests", category: "Primary", rate: 3000, bookedAmount: 3000, specialty: "General", isSurgical: false }
     ];
     setPackages(mockPackages);
     setFilteredPackages(mockPackages);
@@ -149,17 +164,89 @@ const PreAuthFormModal = ({ show, handleClose }) => {
     }));
   };
 
+  // Calculate booked amount based on surgical package rules
+  const calculateBookedAmount = (selectedPackages, newPackage) => {
+    const surgicalPackages = selectedPackages.filter(pkg => pkg.isSurgical);
+    const totalSurgicalPackages = surgicalPackages.length + 1; // Including the new package
+    
+    if (totalSurgicalPackages === 1) {
+      // Single surgical package - 100% of rate
+      return newPackage.rate;
+    } else if (totalSurgicalPackages === 2) {
+      // Two surgical packages - largest gets 100%, second gets 50%
+      // Find the largest among existing surgical packages
+      const maxExistingSurgical = Math.max(...surgicalPackages.map(pkg => pkg.rate));
+      const currentPackageRate = newPackage.rate;
+      
+      // If new package is larger than existing ones, it gets 100%, otherwise 50%
+      if (currentPackageRate > maxExistingSurgical) {
+        return currentPackageRate; // 100%
+      } else {
+        return currentPackageRate * 0.5; // 50%
+      }
+    } else {
+      // Three or more surgical packages - first two as above, additional ones get 25%
+      return newPackage.rate * 0.25; // 25%
+    }
+  };
+
+  // Update booked amounts when packages are added or removed
+  const updateAllBookedAmounts = (packages) => {
+    const surgicalPackages = packages.filter(pkg => pkg.isSurgical);
+    
+    if (surgicalPackages.length === 0) return packages;
+    
+    // Sort surgical packages by rate in descending order
+    const sortedSurgicalPackages = [...surgicalPackages].sort((a, b) => b.rate - a.rate);
+    
+    return packages.map(pkg => {
+      if (!pkg.isSurgical) {
+        // Non-surgical packages get 100% of rate
+        return { ...pkg, bookedAmount: pkg.rate };
+      }
+      
+      const surgicalIndex = sortedSurgicalPackages.findIndex(sp => sp.id === pkg.id);
+      
+      if (surgicalIndex === 0) {
+        // First (largest) surgical package - 100%
+        return { ...pkg, bookedAmount: pkg.rate };
+      } else if (surgicalIndex === 1) {
+        // Second surgical package - 50%
+        return { ...pkg, bookedAmount: pkg.rate * 0.5 };
+      } else if (surgicalIndex >= 2) {
+        // Third and subsequent surgical packages - 25%
+        return { ...pkg, bookedAmount: pkg.rate * 0.25 };
+      }
+      
+      return pkg;
+    });
+  };
+
   const handlePackageSelect = (pkg) => {
+    const newSelectedPackages = [...formData.selectedPackages, { 
+      ...pkg, 
+      prescribingDoctor: "",
+      bookedAmount: pkg.isSurgical ? calculateBookedAmount(formData.selectedPackages, pkg) : pkg.rate
+    }];
+    
+    // Update all booked amounts based on the new selection
+    const updatedPackages = updateAllBookedAmounts(newSelectedPackages);
+    
     setFormData(prev => ({
       ...prev,
-      selectedPackages: [...prev.selectedPackages, { ...pkg, prescribingDoctor: "" }]
+      selectedPackages: updatedPackages
     }));
   };
 
   const removePackage = (index) => {
+    const newSelectedPackages = formData.selectedPackages.filter((_, i) => i !== index);
+    
+    // Update all booked amounts after removal
+    const updatedPackages = updateAllBookedAmounts(newSelectedPackages);
+    
     setFormData(prev => ({
       ...prev,
-      selectedPackages: prev.selectedPackages.filter((_, i) => i !== index)
+      selectedPackages: updatedPackages
     }));
   };
 
@@ -364,22 +451,64 @@ const PreAuthFormModal = ({ show, handleClose }) => {
   };
 
   const calculateTotals = () => {
+    const surgicalPackages = formData.selectedPackages.filter(pkg => pkg.isSurgical);
+    const nonSurgicalPackages = formData.selectedPackages.filter(pkg => !pkg.isSurgical);
+    
+    const surgicalTotal = surgicalPackages.reduce((sum, pkg) => sum + (parseFloat(pkg.bookedAmount) || 0), 0);
+    const nonSurgicalTotal = nonSurgicalPackages.reduce((sum, pkg) => sum + (parseFloat(pkg.bookedAmount) || 0), 0);
+    
     const secondaryTotal = formData.selectedPackages
       .filter(pkg => pkg.category === "Secondary")
-      .reduce((sum, pkg) => sum + (parseFloat(pkg.rate) || 0), 0);
+      .reduce((sum, pkg) => sum + (parseFloat(pkg.bookedAmount) || 0), 0);
     
     const tertiaryTotal = formData.selectedPackages
       .filter(pkg => pkg.category === "Tertiary")
-      .reduce((sum, pkg) => sum + (parseFloat(pkg.rate) || 0), 0);
+      .reduce((sum, pkg) => sum + (parseFloat(pkg.bookedAmount) || 0), 0);
     
-    return { secondaryTotal, tertiaryTotal };
+    return { 
+      surgicalTotal, 
+      nonSurgicalTotal, 
+      secondaryTotal, 
+      tertiaryTotal,
+      grandTotal: surgicalTotal + nonSurgicalTotal
+    };
   };
 
-  const { secondaryTotal, tertiaryTotal } = calculateTotals();
+  const { surgicalTotal, nonSurgicalTotal, secondaryTotal, tertiaryTotal, grandTotal } = calculateTotals();
 
   // Check if package is already selected
   const isPackageSelected = (pkgId) => {
     return formData.selectedPackages.some(pkg => pkg.id === pkgId);
+  };
+
+  // Get sorted selected packages by booked amount (high to low)
+  const getSortedSelectedPackages = () => {
+    return [...formData.selectedPackages].sort((a, b) => b.bookedAmount - a.bookedAmount);
+  };
+
+  // Get surgical package calculation breakdown
+  const getSurgicalCalculationBreakdown = () => {
+    const surgicalPackages = formData.selectedPackages
+      .filter(pkg => pkg.isSurgical)
+      .sort((a, b) => b.rate - a.rate);
+    
+    if (surgicalPackages.length === 0) return null;
+    
+    return (
+      <div className="surgical-calculation-breakdown mt-3 p-3 bg-light rounded">
+        <h6>Surgical Package Calculation Breakdown:</h6>
+        <ul className="mb-0">
+          {surgicalPackages.map((pkg, index) => (
+            <li key={pkg.id}>
+              <strong>{pkg.name}</strong>: 
+              Original Rate: ₹{pkg.rate.toLocaleString()} → 
+              Booked Amount: ₹{pkg.bookedAmount.toLocaleString()} 
+              ({index === 0 ? '100%' : index === 1 ? '50%' : '25%'})
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
   };
 
   // Steps definition
@@ -618,6 +747,7 @@ const PreAuthFormModal = ({ show, handleClose }) => {
                           <th>Package Code</th>
                           <th>Package Name</th>
                           <th>Package Category</th>
+                          <th>Package Type</th>
                           <th>Package Rate (₹)</th>
                           <th>Action</th>
                         </tr>
@@ -628,6 +758,14 @@ const PreAuthFormModal = ({ show, handleClose }) => {
                             <td>{pkg.code}</td>
                             <td>{pkg.name}</td>
                             <td>{pkg.category}</td>
+                            <td>
+                              {pkg.isSurgical ? (
+                                <Badge bg="danger" className="badge-sm">Surgical</Badge>
+
+                              ) : (
+                                <Badge bg="info" className="badge-sm">Non-Surgical</Badge>
+                              )}
+                            </td>
                             <td>₹{pkg.rate.toLocaleString()}</td>
                             <td>
                               <Button
@@ -657,7 +795,7 @@ const PreAuthFormModal = ({ show, handleClose }) => {
             {/* Selected Packages */}
             {formData.selectedPackages.length > 0 && (
               <div className="selected-packages">
-                <h6>Selected Packages</h6>
+                <h6>Selected Packages (Sorted by Booked Amount - High to Low)</h6>
                 <div className="table-responsive">
                   <Table striped bordered hover size="sm">
                     <thead className="table-light">
@@ -665,6 +803,7 @@ const PreAuthFormModal = ({ show, handleClose }) => {
                         <th>Package Code</th>
                         <th>Package Name</th>
                         <th>Package Category</th>
+                        <th>Package Type</th>
                         <th>Package Rate (₹)</th>
                         <th>Booked Amount (₹)</th>
                         <th>Prescribing Doctor</th>
@@ -672,18 +811,34 @@ const PreAuthFormModal = ({ show, handleClose }) => {
                       </tr>
                     </thead>
                     <tbody>
-                      {formData.selectedPackages.map((pkg, index) => (
+                      {getSortedSelectedPackages().map((pkg, index) => (
                         <tr key={index}>
                           <td>{pkg.code}</td>
                           <td>{pkg.name}</td>
                           <td>{pkg.category}</td>
+                          <td>
+                            {pkg.isSurgical ? (
+                                <Badge bg="danger" className="badge-sm">Surgical</Badge>
+                              ) : (
+                                <Badge bg="info" className="badge-sm">Non-Surgical</Badge>
+                            )}
+                          </td>
                           <td>₹{pkg.rate.toLocaleString()}</td>
-                          <td>₹{pkg.bookedAmount.toLocaleString()}</td>
+                          <td>
+                            <strong className={pkg.bookedAmount !== pkg.rate ? "text-warning" : ""}>
+                              ₹{pkg.bookedAmount.toLocaleString()}
+                            </strong>
+                            {pkg.bookedAmount !== pkg.rate && (
+                              <div className="text-muted small">
+                                ({pkg.bookedAmount === pkg.rate * 0.5 ? '50%' : pkg.bookedAmount === pkg.rate * 0.25 ? '25%' : '100%'})
+                              </div>
+                            )}
+                          </td>
                           <td>
                             <Form.Select
                               size="sm"
                               value={pkg.prescribingDoctor}
-                              onChange={(e) => updatePackageField(index, 'prescribingDoctor', e.target.value)}
+                              onChange={(e) => updatePackageField(formData.selectedPackages.findIndex(selectedPkg => selectedPkg.id === pkg.id), 'prescribingDoctor', e.target.value)}
                             >
                               <option value="">Select Doctor</option>
                               {doctors.map(doctor => (
@@ -695,7 +850,7 @@ const PreAuthFormModal = ({ show, handleClose }) => {
                             <Button
                               variant="outline-danger"
                               size="sm"
-                              onClick={() => removePackage(index)}
+                              onClick={() => removePackage(formData.selectedPackages.findIndex(selectedPkg => selectedPkg.id === pkg.id))}
                             >
                               <i className="bi bi-trash"></i>
                             </Button>
@@ -709,17 +864,28 @@ const PreAuthFormModal = ({ show, handleClose }) => {
                 {/* Package Totals */}
                 <div className="package-totals mt-3 p-3 bg-light rounded">
                   <Row>
-                    <Col md={4}>
-                      <strong>Total Secondary Package Amount: ₹{secondaryTotal.toLocaleString()}</strong>
+                    <Col md={3}>
+                      <strong>Surgical Total: ₹{surgicalTotal.toLocaleString()}</strong>
                     </Col>
-                    <Col md={4}>
-                      <strong>Total Tertiary Package Amount: ₹{tertiaryTotal.toLocaleString()}</strong>
+                    <Col md={3}>
+                      <strong>Non-Surgical Total: ₹{nonSurgicalTotal.toLocaleString()}</strong>
                     </Col>
-                    <Col md={4}>
-                      <strong>Grand Total: ₹{(secondaryTotal + tertiaryTotal).toLocaleString()}</strong>
+                    <Col md={3}>
+                      <strong>Secondary Total: ₹{secondaryTotal.toLocaleString()}</strong>
+                    </Col>
+                    <Col md={3}>
+                      <strong>Tertiary Total: ₹{tertiaryTotal.toLocaleString()}</strong>
+                    </Col>
+                  </Row>
+                  <Row className="mt-2">
+                    <Col md={12}>
+                      <h5 className="mb-0">Grand Total: ₹{grandTotal.toLocaleString()}</h5>
                     </Col>
                   </Row>
                 </div>
+
+                {/* Surgical Calculation Breakdown */}
+                {getSurgicalCalculationBreakdown()}
               </div>
             )}
 
@@ -741,7 +907,11 @@ const PreAuthFormModal = ({ show, handleClose }) => {
             
             <div className="alert alert-info mt-4 small">
               <i className="bi bi-info-circle me-2"></i>
-              NOTE: Hospital authorized by CMHO for COVID19 treatment will be eligible to avail COVID19 related packages.
+              <strong>Surgical Package Calculation Rules:</strong><br/>
+              • Single surgical package: 100% of package rate<br/>
+              • Two surgical packages: Largest package 100%, second package 50%<br/>
+              • Three or more surgical packages: First package 100%, second 50%, additional packages 25% each<br/>
+              • Non-surgical packages: Always 100% of package rate
             </div>
 
           </div>
@@ -836,7 +1006,7 @@ const PreAuthFormModal = ({ show, handleClose }) => {
                       }))}
                     >
                       <option value="">Select Package</option>
-                      {formData.selectedPackages.map(pkg => (
+                      {getSortedSelectedPackages().map(pkg => (
                         <option key={pkg.code} value={pkg.code}>{pkg.code} - {pkg.name}</option>
                       ))}
                     </Form.Select>

@@ -1029,3 +1029,14 @@ body {
     }
   }
 /* Login Page Styles end*/
+
+
+/* pre Auth styles*/
+
+.badge-sm {
+    font-size: 0.8rem !important;      /* smaller text */
+    padding: 0.35em 0.5em;  /* tighter padding */
+    line-height: 1;
+    border-radius: 0.35rem; /* slight rounding */
+  }
+  
