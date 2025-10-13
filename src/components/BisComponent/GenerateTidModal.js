@@ -10,11 +10,16 @@ const GenerateTidModal = ({
   showSuccess,
   backdropClicked,
 }) => {
+  // Camera states using your working logic
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+  const [photo, setPhoto] = useState(null);
+  const [streaming, setStreaming] = useState(false);
+  const [cameraError, setCameraError] = useState("");
+  const [isFrontCamera, setIsFrontCamera] = useState(true);
+  const fileInputRef = useRef(null);
+  const [photoSaved, setPhotoSaved] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
-  const [verifyMethod, setVerifyMethod] = useState("aadhaar");
-  const [isMlcCase, setIsMlcCase] = useState(false);
-  const [isPatientIdentified, setIsPatientIdentified] = useState(false);
-  const [gender, setGender] = useState("male");
   const [skipStep2, setSkipStep2] = useState(false);
   const [skipStep3, setSkipStep3] = useState(false);
   const [errors, setErrors] = useState({});
@@ -44,7 +49,7 @@ const GenerateTidModal = ({
     tehsil: "",
     district: "",
     stateName: "",
-    pincode: "",
+    pinCode: "",
     bhamashaId: "",
     janAadhaarId: "",
     memberName: "",
@@ -53,23 +58,101 @@ const GenerateTidModal = ({
     memberRelation: "",
     memberId: "",
     photo: null,
+    verifyMethod: "aadhaar",
   });
+
+  const memberDetailsResp = [
+    {
+      aadhaarNo: "XXXXXXXX7906",
+      abhaNo: "ABHA1234",
+      nameHindi: "भगीरथ प्रजापत",
+      nameEnglish: "Bhagirath Prajapat",
+      gender: "Male",
+      relation: "Self",
+      age: 38,
+      dob: "1985-01-01",
+      hhid: "HH1234",
+      category: "INSTANT",
+      isAadhaarVerified: 1,
+      verifyMethod: "aadhaar",
+      verifyStatus: 1,
+      aadhaarHitCount: 1,
+      fmrReqCount: 0,
+      assessmentYear: "2025",
+    },
+    {
+      aadhaarNo: "XXXXXXXX8318",
+      abhaNo: "ABHA5678",
+      nameHindi: "प्रवंश प्रजापत",
+      nameEnglish: "Pravansh Prajapat",
+      gender: "Male",
+      relation: "Son",
+      age: 11,
+      dob: "2014-05-10",
+      hhid: "HH1234",
+      category: "INSTANT",
+      isAadhaarVerified: 0,
+      verifyMethod: "aadhaar",
+      verifyStatus: 0,
+      aadhaarHitCount: 0,
+      fmrReqCount: 0,
+      assessmentYear: "2025",
+    },
+    {
+      aadhaarNo: "XXXXXXXX8318",
+      abhaNo: "ABHA5678",
+      nameHindi: "प्रवंश प्रजापत",
+      nameEnglish: "Pravansh Prajapat",
+      gender: "Male",
+      relation: "Son",
+      age: 11,
+      dob: "2014-05-10",
+      hhid: "HH1234",
+      category: "INSTANT",
+      isAadhaarVerified: 0,
+      verifyMethod: "aadhaar",
+      verifyStatus: 0,
+      aadhaarHitCount: 0,
+      fmrReqCount: 0,
+      assessmentYear: "2025",
+    },
+    {
+      aadhaarNo: "XXXXXXXX8318",
+      abhaNo: "ABHA5678",
+      nameHindi: "प्रवंश प्रजापत",
+      nameEnglish: "Pravansh Prajapat",
+      gender: "Male",
+      relation: "Son",
+      age: 11,
+      dob: "2014-05-10",
+      hhid: "HH1234",
+      category: "INSTANT",
+      isAadhaarVerified: 0,
+      verifyMethod: "aadhaar",
+      verifyStatus: 0,
+      aadhaarHitCount: 0,
+      fmrReqCount: 0,
+      assessmentYear: "2025",
+    },
+    // Add more members here...
+  ];
+
+  const [selectedMemberIndex, setSelectedMemberIndex] = useState(null);
+
+  const handleSingleMemberSelect = (index) => {
+    if (selectedMemberIndex === index) {
+      setSelectedMemberIndex(null); // unselect if clicked again
+    } else {
+      setSelectedMemberIndex(index);
+    }
+  };
+
   console.log("Form Data:", formData);
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
   // const handleSingleSelect = (key, value) => setFormData({ ...formData, [key]: value });
-
-  // Camera states using your working logic
-  const videoRef = useRef(null);
-  const canvasRef = useRef(null);
-  const [photo, setPhoto] = useState(null);
-  const [streaming, setStreaming] = useState(false);
-  const [cameraError, setCameraError] = useState("");
-  const [isFrontCamera, setIsFrontCamera] = useState(true);
-  const fileInputRef = useRef(null);
-  const [photoSaved, setPhotoSaved] = useState(false);
 
   // Camera logic from your working example
   useEffect(() => {
@@ -197,12 +280,6 @@ const GenerateTidModal = ({
   useEffect(() => {
     if (!show) {
       setCurrentStep(1);
-      // setAdmissionType("normal");
-      // setHasJanAadhaar(true);
-      setIsMlcCase(false);
-      setIsPatientIdentified(false);
-      // setRtaCase("no");
-      setVerifyMethod("aadhaar");
       setSkipStep2(false);
       setSkipStep3(false);
     }
@@ -290,7 +367,7 @@ const GenerateTidModal = ({
       // Normal admission without Jan Aadhaar: skip step 2
       return [
         { number: 1, label: "Search Beneficiary", actualStep: 1 },
-        { number: 2, label: "Member Details", actualStep: 3 },
+        { number: 2, label: "Instant Beneficiary", actualStep: 3 },
         { number: 3, label: "Capture Photograph", actualStep: 4 },
       ];
     } else {
@@ -490,6 +567,9 @@ const GenerateTidModal = ({
                       <label className="form-label">Patient Name</label>
                       <input
                         type="text"
+                        name="patientName"
+                        value={formData.patientName}
+                        onChange={handleChange}
                         className="form-control"
                         placeholder="Enter patient name"
                       />
@@ -498,8 +578,11 @@ const GenerateTidModal = ({
                       <label className="form-label">Age</label>
                       <input
                         type="number"
+                        name="patientAge"
                         className="form-control"
                         placeholder="Age"
+                        value={formData.patientAge}
+                        onChange={handleChange}
                       />
                     </div>
                     <div className="col-md-3">
@@ -511,10 +594,9 @@ const GenerateTidModal = ({
                             type="checkbox"
                             name="gender"
                             id="gender-male"
-                            value="male"
-                            checked={gender === "male"}
+                            checked={formData.gender === "male"}
                             onChange={() =>
-                              handleSingleSelect(setGender, "male", "gender")
+                              handleSingleSelect("gender", "male")
                             }
                           />
                           <label
@@ -531,9 +613,9 @@ const GenerateTidModal = ({
                             name="gender"
                             id="gender-female"
                             value="female"
-                            checked={gender === "female"}
+                            checked={formData.gender === "female"}
                             onChange={() =>
-                              handleSingleSelect(setGender, "female", "gender")
+                              handleSingleSelect("gender", "female")
                             }
                           />
                           <label
@@ -556,11 +638,11 @@ const GenerateTidModal = ({
                           <input
                             className="form-check-input single-select"
                             type="checkbox"
-                            name="mlc-case"
+                            name="isMlcCase"
                             id="mlc-yes"
-                            checked={isMlcCase === true}
+                            checked={formData.isMlcCase === true}
                             onChange={() =>
-                              handleSingleSelect(setIsMlcCase, true, "mlc-case")
+                              handleSingleSelect("isMlcCase", true)
                             }
                           />
                           <label className="form-check-label" htmlFor="mlc-yes">
@@ -571,15 +653,11 @@ const GenerateTidModal = ({
                           <input
                             className="form-check-input single-select"
                             type="checkbox"
-                            name="mlc-case"
+                            name="isMlcCase"
                             id="mlc-no"
-                            checked={isMlcCase === false}
+                            checked={formData.isMlcCase === false}
                             onChange={() =>
-                              handleSingleSelect(
-                                setIsMlcCase,
-                                false,
-                                "mlc-case"
-                              )
+                              handleSingleSelect("isMlcCase", false)
                             }
                           />
                           <label className="form-check-label" htmlFor="mlc-no">
@@ -591,7 +669,7 @@ const GenerateTidModal = ({
                   </div>
 
                   {/* MLC Details - Conditionally Rendered */}
-                  {isMlcCase && (
+                  {formData.isMlcCase && (
                     <div
                       id="mlc-details"
                       className="mlc-details bg-light rounded"
@@ -621,15 +699,11 @@ const GenerateTidModal = ({
                           <input
                             className="form-check-input single-select"
                             type="checkbox"
-                            name="patient-identified"
+                            name="isPatientIdentified"
                             id="patient-unidentified"
-                            checked={isPatientIdentified === false}
+                            checked={formData.isPatientIdentified === false}
                             onChange={() =>
-                              handleSingleSelect(
-                                setIsPatientIdentified,
-                                false,
-                                "patient-identified"
-                              )
+                              handleSingleSelect("isPatientIdentified", false)
                             }
                           />
                           <label
@@ -643,15 +717,11 @@ const GenerateTidModal = ({
                           <input
                             className="form-check-input single-select"
                             type="checkbox"
-                            name="patient-identified"
+                            name="isPatientIdentified"
                             id="patient-identified"
-                            checked={isPatientIdentified === true}
+                            checked={formData.isPatientIdentified === true}
                             onChange={() =>
-                              handleSingleSelect(
-                                setIsPatientIdentified,
-                                true,
-                                "patient-identified"
-                              )
+                              handleSingleSelect("isPatientIdentified", true)
                             }
                           />
                           <label
@@ -666,7 +736,7 @@ const GenerateTidModal = ({
                   </div>
 
                   {/* Identification Details - Conditionally Rendered */}
-                  {isPatientIdentified && (
+                  {formData.isPatientIdentified && (
                     <div
                       id="identification-details"
                       className="identification-details bg-light rounded"
@@ -680,7 +750,10 @@ const GenerateTidModal = ({
                           <input
                             type="text"
                             className="form-control"
+                            name="identifierName"
                             placeholder="Enter name"
+                            value={formData.identifierName}
+                            onChange={handleChange}
                           />
                         </div>
                         <div className="col-md-4 mb-2">
@@ -690,15 +763,21 @@ const GenerateTidModal = ({
                           <input
                             type="text"
                             className="form-control"
+                            name="relationshipWithPatient"
                             placeholder="Enter relationship"
+                            value={formData.relationshipWithPatient}
+                            onChange={handleChange}
                           />
                         </div>
                         <div className="col-md-4 mb-2">
                           <label className="form-label">Contact No.</label>
                           <input
                             type="tel"
+                            name="identifierContact"
                             className="form-control"
                             placeholder="Enter contact number"
+                            value={formData.identifierContact}
+                            onChange={handleChange}
                           />
                         </div>
                       </div>
@@ -849,15 +928,11 @@ const GenerateTidModal = ({
                         <input
                           className="form-check-input single-select"
                           type="checkbox"
-                          name="verify-by"
+                          name="verifyMethod"
                           id="verify-aadhaar"
-                          checked={verifyMethod === "aadhaar"}
+                          checked={formData.verifyMethod === "aadhaar"}
                           onChange={() =>
-                            handleSingleSelect(
-                              setVerifyMethod,
-                              "aadhaar",
-                              "verify-by"
-                            )
+                            handleSingleSelect("verifyMethod", "aadhaar")
                           }
                         />
                         <label
@@ -871,15 +946,11 @@ const GenerateTidModal = ({
                         <input
                           className="form-check-input single-select"
                           type="checkbox"
-                          name="verify-by"
+                          name="verifyMethod"
                           id="verify-moic"
-                          checked={verifyMethod === "moic"}
+                          checked={formData.verifyMethod === "moic"}
                           onChange={() =>
-                            handleSingleSelect(
-                              setVerifyMethod,
-                              "moic",
-                              "verify-by"
-                            )
+                            handleSingleSelect("verifyMethod", "moic")
                           }
                         />
                         <label
@@ -892,7 +963,7 @@ const GenerateTidModal = ({
                     </div>
 
                     {/* MOIC Document Upload Field - Conditionally Rendered */}
-                    {verifyMethod === "moic" && (
+                    {formData.verifyMethod === "moic" && (
                       <div
                         id="moic-doc-upload"
                         className="moic-doc-upload mt-3 p-3 border rounded "
@@ -931,15 +1002,7 @@ const GenerateTidModal = ({
                   <table className="table table-hover">
                     <thead>
                       <tr>
-                        <th>
-                          <div className="form-check">
-                            <input
-                              className="form-check-input"
-                              type="checkbox"
-                              id="select-all-members"
-                            />
-                          </div>
-                        </th>
+                        <th>Select</th>
                         <th>Name (Eng)</th>
                         <th>Name (Hindi)</th>
                         <th>Gender</th>
@@ -951,197 +1014,62 @@ const GenerateTidModal = ({
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
-                        <td>
-                          <div className="form-check">
-                            <input
-                              className="form-check-input"
-                              type="checkbox"
-                              defaultChecked=""
-                            />
-                          </div>
-                        </td>
-                        <td>Bhagirath Prajapat</td>
-                        <td>भगीरथ प्रजापत</td>
-                        <td>Male</td>
-                        <td>38</td>
-                        <td>INSTANT</td>
-                        <td>XXXXXXXX7906</td>
-                        <td>
-                          <span className="badge bg-success">Verified</span>
-                        </td>
-                        <td>
-                          <div className="dropdown">
-                            <Dropdown>
-                              <Dropdown.Toggle
-                                variant="outline-secondary"
-                                size="sm"
-                                disabled={verifyMethod === "moic"}
-                              >
-                                <i className="bi bi-three-dots-vertical"></i>
-                              </Dropdown.Toggle>
-                              <Dropdown.Menu>
-                                <Dropdown.Item href="#">
-                                  <i className="bi bi-person-check" /> Verify
-                                  Aadhaar
-                                </Dropdown.Item>
-                                <Dropdown.Item href="#">
-                                  <i className="bi bi-plus-circle" /> Create
-                                  ABHA
-                                </Dropdown.Item>
-                                <Dropdown.Item href="#">
-                                  <i className="bi bi-arrow-repeat" />{" "}
-                                  Verified/Update ABHA
-                                </Dropdown.Item>
-                              </Dropdown.Menu>
-                            </Dropdown>
-                          </div>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <div className="form-check">
-                            <input
-                              className="form-check-input"
-                              type="checkbox"
-                            />
-                          </div>
-                        </td>
-                        <td>Pravansh Prajapat</td>
-                        <td>प्रवंश प्रजापत</td>
-                        <td>Male</td>
-                        <td>11</td>
-                        <td>INSTANT</td>
-                        <td>XXXXXXXX8318</td>
-                        <td>
-                          <span className="badge bg-warning text-dark">
-                            Pending
-                          </span>
-                        </td>
-                        <td>
-                          <div className="dropdown">
-                            <Dropdown>
-                              <Dropdown.Toggle
-                                variant="outline-secondary"
-                                size="sm"
-                                disabled={verifyMethod === "moic"}
-                              >
-                                <i className="bi bi-three-dots-vertical"></i>
-                              </Dropdown.Toggle>
-                              <Dropdown.Menu>
-                                <Dropdown.Item href="#">
-                                  <i className="bi bi-person-check" /> Verify
-                                  Aadhaar
-                                </Dropdown.Item>
-                                <Dropdown.Item href="#">
-                                  <i className="bi bi-plus-circle" /> Create
-                                  ABHA
-                                </Dropdown.Item>
-                                <Dropdown.Item href="#">
-                                  <i className="bi bi-arrow-repeat" />{" "}
-                                  Verified/Update ABHA
-                                </Dropdown.Item>
-                              </Dropdown.Menu>
-                            </Dropdown>
-                          </div>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <div className="form-check">
-                            <input
-                              className="form-check-input"
-                              type="checkbox"
-                            />
-                          </div>
-                        </td>
-                        <td>Rakshita</td>
-                        <td>रक्षिता</td>
-                        <td>Female</td>
-                        <td>9</td>
-                        <td>INSTANT</td>
-                        <td>XXXXXXXX1913</td>
-                        <td>
-                          <span className="badge bg-warning text-dark">
-                            Pending
-                          </span>
-                        </td>
-                        <td>
-                          <div className="dropdown">
-                            <Dropdown>
-                              <Dropdown.Toggle
-                                variant="outline-secondary"
-                                size="sm"
-                                disabled={verifyMethod === "moic"}
-                              >
-                                <i className="bi bi-three-dots-vertical"></i>
-                              </Dropdown.Toggle>
-                              <Dropdown.Menu>
-                                <Dropdown.Item href="#">
-                                  <i className="bi bi-person-check" /> Verify
-                                  Aadhaar
-                                </Dropdown.Item>
-                                <Dropdown.Item href="#">
-                                  <i className="bi bi-plus-circle" /> Create
-                                  ABHA
-                                </Dropdown.Item>
-                                <Dropdown.Item href="#">
-                                  <i className="bi bi-arrow-repeat" />{" "}
-                                  Verified/Update ABHA
-                                </Dropdown.Item>
-                              </Dropdown.Menu>
-                            </Dropdown>
-                          </div>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <div className="form-check">
-                            <input
-                              className="form-check-input"
-                              type="checkbox"
-                            />
-                          </div>
-                        </td>
-                        <td>Rahul</td>
-                        <td>राहुल</td>
-                        <td>Male</td>
-                        <td>7</td>
-                        <td>INSTANT</td>
-                        <td>XXXXXXXX8654</td>
-                        <td>
-                          <span className="badge bg-warning text-dark">
-                            Pending
-                          </span>
-                        </td>
-                        <td>
-                          <div className="dropdown">
-                            <Dropdown>
-                              <Dropdown.Toggle
-                                variant="outline-secondary"
-                                size="sm"
-                                disabled={verifyMethod === "moic"}
-                              >
-                                <i className="bi bi-three-dots-vertical"></i>
-                              </Dropdown.Toggle>
-                              <Dropdown.Menu>
-                                <Dropdown.Item href="#">
-                                  <i className="bi bi-person-check" /> Verify
-                                  Aadhaar
-                                </Dropdown.Item>
-                                <Dropdown.Item href="#">
-                                  <i className="bi bi-plus-circle" /> Create
-                                  ABHA
-                                </Dropdown.Item>
-                                <Dropdown.Item href="#">
-                                  <i className="bi bi-arrow-repeat" />{" "}
-                                  Verified/Update ABHA
-                                </Dropdown.Item>
-                              </Dropdown.Menu>
-                            </Dropdown>
-                          </div>
-                        </td>
-                      </tr>
+                      {memberDetailsResp.map((member, index) => (
+                        <tr key={index}>
+                          <td>
+                            <div className="form-check">
+                              <input
+                                className="form-check-input"
+                                type="checkbox"
+                                checked={selectedMemberIndex === index}
+                                onChange={() => handleSingleMemberSelect(index)}
+                              />
+                            </div>
+                          </td>
+                          <td>{member.nameEnglish}</td>
+                          <td>{member.nameHindi}</td>
+                          <td>{member.gender}</td>
+                          <td>{member.age}</td>
+                          <td>{member.category}</td>
+                          <td>{member.aadhaarNo}</td>
+                          <td>
+                            {member.verifyStatus === 1 ? (
+                              <span className="badge bg-success">Verified</span>
+                            ) : (
+                              <span className="badge bg-warning text-dark">
+                                Pending
+                              </span>
+                            )}
+                          </td>
+                          <td>
+                            <div className="dropdown">
+                              <Dropdown>
+                                <Dropdown.Toggle
+                                  variant="outline-secondary"
+                                  size="sm"
+                                  disabled={member.verifyMethod === "moic"}
+                                >
+                                  <i className="bi bi-three-dots-vertical"></i>
+                                </Dropdown.Toggle>
+                                <Dropdown.Menu>
+                                  <Dropdown.Item href="#">
+                                    <i className="bi bi-person-check" /> Verify
+                                    Aadhaar
+                                  </Dropdown.Item>
+                                  <Dropdown.Item href="#">
+                                    <i className="bi bi-plus-circle" /> Create
+                                    ABHA
+                                  </Dropdown.Item>
+                                  <Dropdown.Item href="#">
+                                    <i className="bi bi-arrow-repeat" />{" "}
+                                    Verified/Update ABHA
+                                  </Dropdown.Item>
+                                </Dropdown.Menu>
+                              </Dropdown>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
                 </div>
@@ -1161,8 +1089,11 @@ const GenerateTidModal = ({
                       </label>
                       <input
                         type="text"
+                        name="patientName"
                         className="form-control"
                         placeholder="Enter patient name"
+                        value={formData.patientName}
+                        onChange={handleChange}
                       />
                     </div>
 
@@ -1170,8 +1101,11 @@ const GenerateTidModal = ({
                       <label className="form-label">Age</label>
                       <input
                         type="number"
+                        name="patientAge"
                         className="form-control"
                         placeholder="Age"
+                        value={formData.age}
+                        onChange={handleChange}
                       />
                     </div>
 
@@ -1184,11 +1118,11 @@ const GenerateTidModal = ({
                           <input
                             className="form-check-input single-select"
                             type="checkbox"
-                            name="instant-gender"
+                            name="gender"
                             id="instant-gender-male"
-                            checked={gender === "male"}
+                            checked={formData.gender === "male"}
                             onChange={() =>
-                              handleSingleSelect(setGender, "male", "gender")
+                              handleSingleSelect("gender", "male")
                             }
                           />
                           <label
@@ -1202,11 +1136,11 @@ const GenerateTidModal = ({
                           <input
                             className="form-check-input single-select"
                             type="checkbox"
-                            name="instant-gender"
+                            name="gender"
                             id="instant-gender-female"
-                            checked={gender === "female"}
+                            checked={formData.gender === "female"}
                             onChange={() =>
-                              handleSingleSelect(setGender, "female", "gender")
+                              handleSingleSelect("gender", "female")
                             }
                           />
                           <label
@@ -1223,8 +1157,11 @@ const GenerateTidModal = ({
                       <label className="form-label">Mobile No</label>
                       <input
                         type="tel"
+                        name="mobileNo"
                         className="form-control"
                         placeholder="Enter mobile number"
+                        value={formData.mobileNo}
+                        onChange={handleChange}
                       />
                     </div>
 
@@ -1232,8 +1169,11 @@ const GenerateTidModal = ({
                       <label className="form-label">House No</label>
                       <input
                         type="text"
+                        name="houseNo"
                         className="form-control"
                         placeholder="Enter house number"
+                        value={formData.houseNo}
+                        onChange={handleChange}
                       />
                     </div>
 
@@ -1241,8 +1181,11 @@ const GenerateTidModal = ({
                       <label className="form-label">Colony/Street</label>
                       <input
                         type="text"
+                        name="colonyStreet"
                         className="form-control"
                         placeholder="Enter colony/street"
+                        value={formData.colonyStreet}
+                        onChange={handleChange}
                       />
                     </div>
 
@@ -1250,8 +1193,11 @@ const GenerateTidModal = ({
                       <label className="form-label">Block/Ward</label>
                       <input
                         type="text"
+                        name="blockWard"
                         className="form-control"
                         placeholder="Enter block/ward"
+                        value={formData.blockWard}
+                        onChange={handleChange}
                       />
                     </div>
 
@@ -1259,8 +1205,11 @@ const GenerateTidModal = ({
                       <label className="form-label">Village</label>
                       <input
                         type="text"
+                        name="village"
                         className="form-control"
                         placeholder="Enter village"
+                        value={formData.village}
+                        onChange={handleChange}
                       />
                     </div>
 
@@ -1268,8 +1217,11 @@ const GenerateTidModal = ({
                       <label className="form-label">Tehsil</label>
                       <input
                         type="text"
+                        name="tehsil"
                         className="form-control"
                         placeholder="Enter tehsil"
+                        value={formData.tehsil}
+                        onChange={handleChange}
                       />
                     </div>
 
@@ -1289,8 +1241,11 @@ const GenerateTidModal = ({
                       <label className="form-label">Pin Code</label>
                       <input
                         type="text"
+                        name="pinCode"
                         className="form-control"
                         placeholder="Enter pin code"
+                        value={formData.pinCode}
+                        onChange={handleChange}
                       />
                     </div>
 
@@ -1298,7 +1253,12 @@ const GenerateTidModal = ({
                       <label className="form-label">
                         Residence State <span className="text-danger">*</span>
                       </label>
-                      <select className="form-select">
+                      <select
+                        className="form-select"
+                        name="residenceState"
+                        onChange={handleChange}
+                        value={formData.residenceState}
+                      >
                         <option value="">- Select -</option>
                         <option value="state1">State 1</option>
                         <option value="state2">State 2</option>
@@ -1308,10 +1268,15 @@ const GenerateTidModal = ({
 
                     <div className="col-md-6 mb-2">
                       <label className="form-label">
-                        Residence District{" "}
+                        Residence District
                         <span className="text-danger">*</span>
                       </label>
-                      <select className="form-select">
+                      <select
+                        className="form-select"
+                        name="residenceDistrict"
+                        onChange={handleChange}
+                        value={formData.residenceDistrict}
+                      >
                         <option value="">- Select -</option>
                         <option value="district1">District 1</option>
                         <option value="district2">District 2</option>
@@ -1329,15 +1294,11 @@ const GenerateTidModal = ({
                           <input
                             className="form-check-input single-select"
                             type="checkbox"
-                            name="verification-by"
+                            name="verifyMethod"
                             id="verification-aadhaar"
-                            checked={verifyMethod === "aadhaar"}
+                            checked={formData.verifyMethod === "aadhaar"}
                             onChange={() =>
-                              handleSingleSelect(
-                                setVerifyMethod,
-                                "aadhaar",
-                                "verify-by"
-                              )
+                              handleSingleSelect("verifyMethod", "aadhaar")
                             }
                           />
                           <label
@@ -1351,15 +1312,11 @@ const GenerateTidModal = ({
                           <input
                             className="form-check-input single-select"
                             type="checkbox"
-                            name="verification-by"
+                            name="verifyMethod"
                             id="verification-moic"
-                            checked={verifyMethod === "moic"}
+                            checked={formData.verifyMethod === "moic"}
                             onChange={() =>
-                              handleSingleSelect(
-                                setVerifyMethod,
-                                "moic",
-                                "verify-by"
-                              )
+                              handleSingleSelect("verifyMethod", "moic")
                             }
                           />
                           <label
@@ -1374,7 +1331,7 @@ const GenerateTidModal = ({
                   </div>
 
                   {/* Aadhaar Case Conditionally Rendered */}
-                  {verifyMethod === "aadhaar" && (
+                  {formData.verifyMethod === "aadhaar" && (
                     <div
                       id="moic-doc-upload"
                       className="moic-doc-upload m-0 p-3 border rounded "
@@ -1400,7 +1357,7 @@ const GenerateTidModal = ({
                     </div>
                   )}
                   {/* MOIC Document Upload Field - Conditionally Rendered */}
-                  {verifyMethod === "moic" && (
+                  {formData.verifyMethod === "moic" && (
                     <div
                       id="moic-doc-upload"
                       className="moic-doc-upload mt-3 p-3 border rounded "
