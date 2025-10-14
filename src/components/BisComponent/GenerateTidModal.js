@@ -3,6 +3,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "animate.css";
 import { Modal, Dropdown, Button } from "react-bootstrap";
 import Swal from "sweetalert2"; // Import SweetAlert2
+// import { getBeneficiaryDetails } from "../../framework/apiendpoint";
+import { IDENTITY_TYPES, initialFormData } from "../../constants";
 
 const GenerateTidModal = ({
   show,
@@ -20,122 +22,84 @@ const GenerateTidModal = ({
   const fileInputRef = useRef(null);
   const [photoSaved, setPhotoSaved] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
-  const [skipStep2, setSkipStep2] = useState(false);
-  const [skipStep3, setSkipStep3] = useState(false);
+  const [skipContactDetail, setSkipStep2] = useState(false);
+  const [skipMemberDetail, setSkipStep3] = useState(false);
   const [errors, setErrors] = useState({});
-  const [formData, setFormData] = useState({
-    rtaCase: "no",
-    admissionType: "normal",
-    hasJanAadhaar: true,
-    patientName: "",
-    patientAge: "",
-    gender: "",
-    isMlcCase: false,
-    assaultType: "",
-    isPatientIdentified: false,
-    identifierName: "",
-    identifierRelation: "",
-    identifierContact: "",
-    identityType: "",
-    identityNumber: "",
-    entitlementType: "",
-    rationCard: "",
-    mobileNo: "",
-    houseNumber: "",
-    street: "",
-    block: "",
-    gramPanchayat: "",
-    village: "",
-    tehsil: "",
-    district: "",
-    stateName: "",
-    pinCode: "",
-    bhamashaId: "",
-    janAadhaarId: "",
-    memberName: "",
-    memberAge: "",
-    memberGender: "",
-    memberRelation: "",
-    memberId: "",
-    photo: null,
-    verifyMethod: "aadhaar",
+  const [beneficiaryData, setBeneficiaryData] = useState({
+    entitlementType: "APL",
+    rationCardNo: "RC1234567890",
+    mobileNo: 9876543210,
+    houseNo: "12B",
+    colonyStreet: "Shivaji Nagar, Main Road",
+    blockWard: "Ward 24",
+    gramPanchayat: "Gopalpura",
+    village: "Rampura",
+    tehsil: "Sanganer",
+    district: "Jaipur",
+    state: "Rajasthan",
+    pin: 302029,
+    bhamashaId: 100234567890,
+    janAadhaarId: 1234567890123,
+    memberDetailsResp: [
+      {
+        aadhaarNo: "567812349012",
+        abhaNo: "ABHA12345678",
+        nameHindi: "गोपाल लाल",
+        nameEnglish: "Gopal Lal",
+        gender: "Male",
+        relation: "Head",
+        age: 45,
+        dob: "1980-06-12T00:00:00.000Z",
+        hhid: "HH123456",
+        category: "OBC",
+        isAadhaarVerified: 1,
+        verifyMethod: "OTP",
+        verifyStatus: 1,
+        aadhaarHitCount: 2,
+        fmrReqCount: 1,
+        assessmentYear: "2024-25",
+      },
+      {
+        aadhaarNo: "901245678901",
+        abhaNo: "ABHA98765432",
+        nameHindi: "सीता देवी",
+        nameEnglish: "Sita Devi",
+        gender: "Female",
+        relation: "Spouse",
+        age: 42,
+        dob: "1983-11-04T00:00:00.000Z",
+        hhid: "HH123456",
+        category: "OBC",
+        isAadhaarVerified: 0,
+        verifyMethod: "Biometric",
+        verifyStatus: 0,
+        aadhaarHitCount: 3,
+        fmrReqCount: 0,
+        assessmentYear: "2024-25",
+      },
+      {
+        aadhaarNo: "678901234567",
+        abhaNo: "ABHA11223344",
+        nameHindi: "राजेश लाल",
+        nameEnglish: "Rajesh Lal",
+        gender: "Male",
+        relation: "Son",
+        age: 18,
+        dob: "2007-02-15T00:00:00.000Z",
+        hhid: "HH123456",
+        category: "OBC",
+        isAadhaarVerified: 0,
+        verifyMethod: "None",
+        verifyStatus: 0,
+        aadhaarHitCount: 0,
+        fmrReqCount: 0,
+        assessmentYear: "2024-25",
+      },
+    ],
+    status: 1,
+    message: "Data fetched successfully",
   });
-
-  const memberDetailsResp = [
-    {
-      aadhaarNo: "XXXXXXXX7906",
-      abhaNo: "ABHA1234",
-      nameHindi: "भगीरथ प्रजापत",
-      nameEnglish: "Bhagirath Prajapat",
-      gender: "Male",
-      relation: "Self",
-      age: 38,
-      dob: "1985-01-01",
-      hhid: "HH1234",
-      category: "INSTANT",
-      isAadhaarVerified: 1,
-      verifyMethod: "aadhaar",
-      verifyStatus: 1,
-      aadhaarHitCount: 1,
-      fmrReqCount: 0,
-      assessmentYear: "2025",
-    },
-    {
-      aadhaarNo: "XXXXXXXX8318",
-      abhaNo: "ABHA5678",
-      nameHindi: "प्रवंश प्रजापत",
-      nameEnglish: "Pravansh Prajapat",
-      gender: "Male",
-      relation: "Son",
-      age: 11,
-      dob: "2014-05-10",
-      hhid: "HH1234",
-      category: "INSTANT",
-      isAadhaarVerified: 0,
-      verifyMethod: "aadhaar",
-      verifyStatus: 0,
-      aadhaarHitCount: 0,
-      fmrReqCount: 0,
-      assessmentYear: "2025",
-    },
-    {
-      aadhaarNo: "XXXXXXXX8318",
-      abhaNo: "ABHA5678",
-      nameHindi: "प्रवंश प्रजापत",
-      nameEnglish: "Pravansh Prajapat",
-      gender: "Male",
-      relation: "Son",
-      age: 11,
-      dob: "2014-05-10",
-      hhid: "HH1234",
-      category: "INSTANT",
-      isAadhaarVerified: 0,
-      verifyMethod: "aadhaar",
-      verifyStatus: 0,
-      aadhaarHitCount: 0,
-      fmrReqCount: 0,
-      assessmentYear: "2025",
-    },
-    {
-      aadhaarNo: "XXXXXXXX8318",
-      abhaNo: "ABHA5678",
-      nameHindi: "प्रवंश प्रजापत",
-      nameEnglish: "Pravansh Prajapat",
-      gender: "Male",
-      relation: "Son",
-      age: 11,
-      dob: "2014-05-10",
-      hhid: "HH1234",
-      category: "INSTANT",
-      isAadhaarVerified: 0,
-      verifyMethod: "aadhaar",
-      verifyStatus: 0,
-      aadhaarHitCount: 0,
-      fmrReqCount: 0,
-      assessmentYear: "2025",
-    },
-    // Add more members here...
-  ];
+  const [formData, setFormData] = useState(initialFormData);
 
   const [selectedMemberIndex, setSelectedMemberIndex] = useState(null);
 
@@ -152,7 +116,6 @@ const GenerateTidModal = ({
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-  // const handleSingleSelect = (key, value) => setFormData({ ...formData, [key]: value });
 
   // Camera logic from your working example
   useEffect(() => {
@@ -285,7 +248,7 @@ const GenerateTidModal = ({
     }
   }, [show]);
 
-  // Update skipStep2 and skipStep3 based on admission type and Jan Aadhaar
+  // Update skipContactDetail and skipMemberDetail based on admission type and Jan Aadhaar
   useEffect(() => {
     if (formData.admissionType === "normal") {
       // For normal admission: skip step 2 only if no Jan Aadhaar
@@ -306,21 +269,37 @@ const GenerateTidModal = ({
     }));
   };
 
-  const nextStep = () => {
+  const hasVerifiedMember = beneficiaryData?.memberDetailsResp?.some(
+    (member) => member.verifyStatus === "verified"
+  );
+
+  const nextStepFunc = () => {
     if (currentStep < 4) {
       let nextStep = currentStep + 1;
 
-      // Handle step skipping logic
       if (currentStep === 1) {
-        if (skipStep2 && skipStep3) {
-          // Emergency case: skip both step 2 and step 3
+        // CASE 1: Emergency (skip contact + member)
+        if (skipContactDetail && skipMemberDetail) {
           nextStep = 4;
-        } else if (skipStep2 && !skipStep3) {
-          // Normal admission without Jan Aadhaar: skip only step 2
+        }
+        // CASE 2: Normal admission but no Jan Aadhaar (skip contact only)
+        else if (skipContactDetail && !skipMemberDetail) {
           nextStep = 3;
         }
-      } else if (currentStep === 2 && skipStep3) {
-        // If we're on step 2 and step 3 should be skipped (emergency case)
+        // ✅ CASE 3: Normal admission WITH Jan Aadhaar → call API before moving ahead
+        else if (!skipContactDetail && !skipMemberDetail) {
+          if (
+            formData.admissionType === "normal" &&
+            formData.identityType &&
+            formData.identityNumber
+          ) {
+            console.log("Calling getSearchBeneficiary()...");
+            // getSearchBeneficiary(); // call your function here
+          }
+        }
+      }
+      // CASE 4: Skip step 3 for emergency
+      else if (currentStep === 2 && skipMemberDetail) {
         nextStep = 4;
       }
 
@@ -334,14 +313,14 @@ const GenerateTidModal = ({
 
       // Handle step skipping logic when going back
       if (currentStep === 4) {
-        if (skipStep2 && skipStep3) {
+        if (skipContactDetail && skipMemberDetail) {
           // Emergency case: go back to step 1 from step 4
           previousStep = 1;
-        } else if (skipStep2 && !skipStep3) {
+        } else if (skipContactDetail && !skipMemberDetail) {
           // Normal admission without Jan Aadhaar: go back to step 3 from step 4
           previousStep = 3;
         }
-      } else if (currentStep === 3 && skipStep2) {
+      } else if (currentStep === 3 && skipContactDetail) {
         // If we're on step 3 and step 2 was skipped
         previousStep = 1;
       }
@@ -357,13 +336,13 @@ const GenerateTidModal = ({
 
   // Determine which steps to display in the step indicator
   const getStepsToDisplay = () => {
-    if (skipStep2 && skipStep3) {
+    if (skipContactDetail && skipMemberDetail) {
       // Emergency case: show only step 1 and step 4
       return [
         { number: 1, label: "Search Beneficiary", actualStep: 1 },
         { number: 2, label: "Capture Photograph", actualStep: 4 },
       ];
-    } else if (skipStep2 && !skipStep3) {
+    } else if (skipContactDetail && !skipMemberDetail) {
       // Normal admission without Jan Aadhaar: skip step 2
       return [
         { number: 1, label: "Search Beneficiary", actualStep: 1 },
@@ -390,6 +369,7 @@ const GenerateTidModal = ({
     setIsFrontCamera(false);
     fileInputRef.current = null;
     setPhotoSaved(false);
+    setFormData(initialFormData);
   };
 
   const stepsToDisplay = getStepsToDisplay();
@@ -415,7 +395,7 @@ const GenerateTidModal = ({
               className={`step ${
                 currentStep === step.actualStep ? "active" : ""
               } ${currentStep > step.actualStep ? "completed" : ""} ${
-                skipStep2 && step.actualStep === 2 ? "skipped" : ""
+                skipContactDetail && step.actualStep === 2 ? "skipped" : ""
               }`}
             >
               <div className="step-icon">{step.number}</div>
@@ -803,10 +783,14 @@ const GenerateTidModal = ({
                     onChange={handleChange}
                   >
                     <option value="">Select Identity Type</option>
-                    <option value="aadhaar">Aadhaar Card</option>
-                    <option value="driving">Driving License</option>
-                    <option value="voter">Voter ID</option>
-                    <option value="pan">PAN Card</option>
+                    {IDENTITY_TYPES.map((type) => (
+                      <option
+                        key={type.identityTypeId}
+                        value={type.identityTypeId}
+                      >
+                        {type.description}
+                      </option>
+                    ))}
                   </select>
                   {errors.identityType && (
                     <div className="invalid-feedback">
@@ -840,73 +824,101 @@ const GenerateTidModal = ({
           </div>
         )}
 
-        {currentStep === 2 && !skipStep2 && (
+        {currentStep === 2 && !skipContactDetail && (
           <div className="tab-pane fade show active">
             <h4 className="step-heading">Contact Details of Beneficiary</h4>
             <div className="row">
               <div className="col-md-4 mb-2">
                 <label className="form-label">Entitlement Type</label>
-                <div className="form-control bg-light">NFSA</div>
+                <div className="form-control bg-light">
+                  {beneficiaryData?.entitlementType || "-"}
+                </div>
               </div>
               <div className="col-md-4 mb-2">
                 <label className="form-label">Ration Card No</label>
-                <div className="form-control bg-light">123456789</div>
+                <div className="form-control bg-light">
+                  {beneficiaryData?.rationCardNo || "-"}
+                </div>
               </div>
               <div className="col-md-4 mb-2">
                 <label className="form-label">Mobile No</label>
-                <div className="form-control bg-light">123456789</div>
+                <div className="form-control bg-light">
+                  {beneficiaryData?.mobileNo || "-"}
+                </div>
               </div>
             </div>
             <div className="row">
               <div className="col-md-4 mb-2">
                 <label className="form-label">House Number</label>
-                <div className="form-control bg-light">123</div>
+                <div className="form-control bg-light">
+                  {beneficiaryData?.houseNo || "-"}
+                </div>
               </div>
               <div className="col-md-4 mb-2">
                 <label className="form-label">Colony/Street</label>
-                <div className="form-control bg-light">ABCD Colony</div>
+                <div className="form-control bg-light">
+                  {beneficiaryData?.colonyStreet || "-"}
+                </div>
               </div>
               <div className="col-md-4 mb-2">
                 <label className="form-label">Block/Ward</label>
-                <div className="form-control bg-light">Ward No 26</div>
+                <div className="form-control bg-light">
+                  {beneficiaryData?.blockWard || "-"}
+                </div>
               </div>
             </div>
             <div className="row">
               <div className="col-md-4 ">
                 <label className="form-label">Gram Panchayat</label>
-                <div className="form-control bg-light">Abc Grampanchayat</div>
+                <div className="form-control bg-light">
+                  {beneficiaryData?.gramPanchayat || "-"}
+                </div>
               </div>
               <div className="col-md-4 ">
                 <label className="form-label">Village</label>
-                <div className="form-control bg-light">ABC Village</div>
+                <div className="form-control bg-light">
+                  {beneficiaryData?.village || "-"}
+                </div>
               </div>
               <div className="col-md-4 ">
                 <label className="form-label">Tehsil</label>
-                <div className="form-control bg-light">ABCD</div>
+                <div className="form-control bg-light">
+                  {beneficiaryData?.tehsil || "-"}
+                </div>
               </div>
             </div>
             <div className="row">
               <div className="col-md-4 ">
                 <label className="form-label">District</label>
-                <div className="form-control bg-light">Abc District</div>
+                <div className="form-control bg-light">
+                  {beneficiaryData?.district || "-"}
+                </div>
               </div>
               <div className="col-md-4 ">
                 <label className="form-label">State</label>
-                <div className="form-control bg-light">Rajasthan</div>
+                <div className="form-control bg-light">
+                  {beneficiaryData?.state || "-"}
+                </div>
               </div>
               <div className="col-md-4 ">
                 <label className="form-label">Pincode</label>
-                <div className="form-control bg-light">303303</div>
+                <div className="form-control bg-light">
+                  {beneficiaryData?.pin || "-"}
+                </div>
               </div>
             </div>
             <div className="row">
               <div className="col-md-6 ">
                 <label className="form-label">Bhamasha ID</label>
-                <div className="form-control bg-light">ABCDEFGH</div>
+                <div className="form-control bg-light">
+                  {beneficiaryData?.bhamashaId || "-"}
+                </div>
               </div>
               <div className="col-md-6 ">
                 <label className="form-label">Jan Aadhaar ID</label>
-                <div className="form-control bg-light">4XXXXXXXX88</div>
+                <div className="form-control bg-light">
+                  {beneficiaryData?.janAadhaarId || "-"}
+                </div>
               </div>
             </div>
           </div>
@@ -999,7 +1011,7 @@ const GenerateTidModal = ({
                 </div>
 
                 <div className="table-responsive">
-                  <table className="table table-hover">
+                  <table className="table table-hover align-middle">
                     <thead>
                       <tr>
                         <th>Select</th>
@@ -1014,62 +1026,99 @@ const GenerateTidModal = ({
                       </tr>
                     </thead>
                     <tbody>
-                      {memberDetailsResp.map((member, index) => (
-                        <tr key={index}>
-                          <td>
-                            <div className="form-check">
-                              <input
-                                className="form-check-input"
-                                type="checkbox"
-                                checked={selectedMemberIndex === index}
-                                onChange={() => handleSingleMemberSelect(index)}
-                              />
-                            </div>
-                          </td>
-                          <td>{member.nameEnglish}</td>
-                          <td>{member.nameHindi}</td>
-                          <td>{member.gender}</td>
-                          <td>{member.age}</td>
-                          <td>{member.category}</td>
-                          <td>{member.aadhaarNo}</td>
-                          <td>
-                            {member.verifyStatus === 1 ? (
-                              <span className="badge bg-success">Verified</span>
-                            ) : (
-                              <span className="badge bg-warning text-dark">
-                                Pending
-                              </span>
-                            )}
-                          </td>
-                          <td>
-                            <div className="dropdown">
-                              <Dropdown>
-                                <Dropdown.Toggle
-                                  variant="outline-secondary"
-                                  size="sm"
-                                  disabled={member.verifyMethod === "moic"}
-                                >
-                                  <i className="bi bi-three-dots-vertical"></i>
-                                </Dropdown.Toggle>
-                                <Dropdown.Menu>
-                                  <Dropdown.Item href="#">
-                                    <i className="bi bi-person-check" /> Verify
-                                    Aadhaar
-                                  </Dropdown.Item>
-                                  <Dropdown.Item href="#">
-                                    <i className="bi bi-plus-circle" /> Create
-                                    ABHA
-                                  </Dropdown.Item>
-                                  <Dropdown.Item href="#">
-                                    <i className="bi bi-arrow-repeat" />{" "}
-                                    Verified/Update ABHA
-                                  </Dropdown.Item>
-                                </Dropdown.Menu>
-                              </Dropdown>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
+                      {beneficiaryData?.memberDetailsResp?.map(
+                        (member, index) => {
+                          const isVerified = member.verifyStatus === 1;
+                          const hasVerifiedMember =
+                            beneficiaryData.memberDetailsResp.some(
+                              (m) => m.verifyStatus === 1
+                            );
+                          const disableRow = hasVerifiedMember && !isVerified;
+
+                          return (
+                            <tr
+                              key={index}
+                              className={
+                                isVerified
+                                  ? "table-success"
+                                  : disableRow
+                                  ? "table-secondary"
+                                  : ""
+                              }
+                              style={{
+                                opacity: disableRow ? 0.6 : 1,
+                                cursor: disableRow ? "not-allowed" : "pointer",
+                              }}
+                              title={
+                                disableRow
+                                  ? "Disabled because another member is already verified"
+                                  : ""
+                              }
+                            >
+                              <td>
+                                <div className="form-check">
+                                  <input
+                                    className="form-check-input"
+                                    type="checkbox"
+                                    checked={selectedMemberIndex === index}
+                                    onChange={() =>
+                                      handleSingleMemberSelect(index)
+                                    }
+                                    disabled={disableRow}
+                                  />
+                                </div>
+                              </td>
+                              <td>{member.nameEnglish}</td>
+                              <td>{member.nameHindi}</td>
+                              <td>{member.gender}</td>
+                              <td>{member.age}</td>
+                              <td>{member.category}</td>
+                              <td>{member.aadhaarNo}</td>
+                              <td>
+                                {isVerified ? (
+                                  <span className="badge bg-success">
+                                    Verified
+                                  </span>
+                                ) : (
+                                  <span className="badge bg-warning text-dark">
+                                    Pending
+                                  </span>
+                                )}
+                              </td>
+                              <td>
+                                <div className="dropdown">
+                                  <Dropdown>
+                                    <Dropdown.Toggle
+                                      variant="outline-secondary"
+                                      size="sm"
+                                      disabled={
+                                        disableRow ||
+                                        member.verifyMethod === "moic"
+                                      }
+                                    >
+                                      <i className="bi bi-three-dots-vertical"></i>
+                                    </Dropdown.Toggle>
+                                    <Dropdown.Menu>
+                                      <Dropdown.Item href="#">
+                                        <i className="bi bi-person-check" />{" "}
+                                        Verify Aadhaar
+                                      </Dropdown.Item>
+                                      <Dropdown.Item href="#">
+                                        <i className="bi bi-plus-circle" />{" "}
+                                        Create ABHA
+                                      </Dropdown.Item>
+                                      <Dropdown.Item href="#">
+                                        <i className="bi bi-arrow-repeat" />{" "}
+                                        Verified/Update ABHA
+                                      </Dropdown.Item>
+                                    </Dropdown.Menu>
+                                  </Dropdown>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        }
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -1694,7 +1743,7 @@ const GenerateTidModal = ({
           </Button>
         )}
         {currentStep < 4 ? (
-          <Button type="button" variant="success" onClick={nextStep}>
+          <Button type="button" variant="success" onClick={nextStepFunc}>
             Next <i className="bi bi-arrow-right"></i>
           </Button>
         ) : (
