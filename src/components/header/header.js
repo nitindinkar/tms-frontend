@@ -71,7 +71,7 @@ const Header = ({ toggleSidebar, sidebarCollapsed }) => {
           </div>
 
           {/* User Profile Dropdown */}
-          <Dropdown align="end">
+          <Dropdown align="end" className='profile-drop'>
             <Dropdown.Toggle className="d-flex align-items-center text-white bg-transparent border-0 shadow-none">
               <div className="avatar me-2 fs-4"><i className="bi bi-person-fill"></i></div>
               <div className="text-start">
@@ -90,6 +90,17 @@ const Header = ({ toggleSidebar, sidebarCollapsed }) => {
               </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
+
+          {/* Toggle button - visible only on mobile */}
+          <button 
+            className="navbar-toggler d-lg-none me-2 border-0 text-light" 
+            type="button"
+            onClick={toggleSidebar}
+            aria-label="Toggle sidebar"
+            style={{ fontSize: '1.5rem' }}
+          >
+            <i className={`bi ${sidebarCollapsed ? 'bi-list' : 'bi-x-lg'}`}></i>
+          </button>
         </div>
       </div>
     </nav>

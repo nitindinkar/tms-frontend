@@ -52,7 +52,7 @@ const TIDListing = ({ setShowGenerateModal }) => {
                 </button>
               </div>
             </div>
-            <div className="col-md-4 text-md-end">
+            <div className="col-md-4 text-md-end mt-md-0 mt-2">
               <button
                 className="btn btn-success"
                 onClick={handleGenerateTidClick}
@@ -159,7 +159,7 @@ const TIDListing = ({ setShowGenerateModal }) => {
                 </a>
               </li>
             </ul>
-            <div className="d-flex align-items-center">
+            <div className="d-flex align-items-center justify-content-center">
               <span className="me-2">Show</span>
               <select
                 className="form-select form-select-sm"

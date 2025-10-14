@@ -250,11 +250,14 @@ body {
 }
 
 @media (max-width: 768px) {
+    .logo-img{
+        width: 50px;
+    }
     .sidebar {
         width: 100%;
         height: auto;
-        position: relative;
-        top: 0;
+        position: absolute;
+        top: 70px;
     }
     
     .main-content {
@@ -263,8 +266,18 @@ body {
     .header-title-text{
         display: none;
     }
-    .header-container{
-        justify-content: start !important;
+    .profile-drop {
+     display: none;
+    }
+    :root{
+        --sidebar-collapsed: 0px;
+    }
+    .table-footer{
+        flex-direction: column;
+    }
+    .table-footer nav{
+     display: block !important;
+     text-align: center !important;
     }
 
 }
@@ -1040,3 +1053,16 @@ body {
     border-radius: 0.35rem; /* slight rounding */
   }
   
+  .sortable-header:hover {
+    background-color: #f8f9fa;
+  }
+  
+  .sort-icon {
+    margin-left: 5px;
+    font-size: 0.8rem;
+    opacity: 0.6;
+  }
+  
+  .sortable-header:hover .sort-icon {
+    opacity: 1;
+  }

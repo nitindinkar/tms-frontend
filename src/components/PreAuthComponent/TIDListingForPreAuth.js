@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import "bootstrap/dist/css/bootstrap.min.css";
 import PreAuthFormModal from './PreAuthFormModal';
+
 const TIDListingForPreAuth = ({ setShowGenerateModal }) => {
   const [recordsPerPage, setRecordsPerPage] = useState(5);
   const [currentPage, setCurrentPage] = useState(1);
   const [showPreAuthModal, setShowPreAuthModal] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState(null);
-
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
 
   // ✅ Actual table data from screenshot
   const tableData = [
@@ -28,21 +29,59 @@ const TIDListingForPreAuth = ({ setShowGenerateModal }) => {
     { tid: 'T0905232467425', name: 'bv', admissionType: 'Normal', identityType: 'Bhamashah', enrollmentDate: '2023-05-09 12:10:53.0' }
   ];
 
+  // ✅ Sorting function
+  const handleSort = (key) => {
+    let direction = 'asc';
+    if (sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setSortConfig({ key, direction });
+  };
+
+  // ✅ Get sorted data
+  const getSortedData = () => {
+    if (!sortConfig.key) return tableData;
+
+    const sortedData = [...tableData].sort((a, b) => {
+      if (a[sortConfig.key] < b[sortConfig.key]) {
+        return sortConfig.direction === 'asc' ? -1 : 1;
+      }
+      if (a[sortConfig.key] > b[sortConfig.key]) {
+        return sortConfig.direction === 'asc' ? 1 : -1;
+      }
+      return 0;
+    });
+
+    return sortedData;
+  };
+
+  const sortedData = getSortedData();
+
   const handleRecordsPerPageChange = (e) => {
     setRecordsPerPage(parseInt(e.target.value));
     setCurrentPage(1);
   };
 
-    // ✅ Open Modal with selected patient
-    const handlePreAuthClick = (patient) => {
-      setSelectedPatient(patient);
-      setShowPreAuthModal(true);
-    };
+  // ✅ Open Modal with selected patient
+  const handlePreAuthClick = (patient) => {
+    setSelectedPatient(patient);
+    setShowPreAuthModal(true);
+  };
 
-  const paginatedData = tableData.slice(
+  const paginatedData = sortedData.slice(
     (currentPage - 1) * recordsPerPage,
     currentPage * recordsPerPage
   );
+
+  // ✅ Get sort icon based on current sort state
+  const getSortIcon = (key) => {
+    if (sortConfig.key !== key) {
+      return <i className="bi bi-arrow-down-up sort-icon" />;
+    }
+    return sortConfig.direction === 'asc' 
+      ? <i className="bi bi-arrow-up sort-icon" />
+      : <i className="bi bi-arrow-down sort-icon" />;
+  };
 
   return (
     <div className="card">
@@ -84,11 +123,41 @@ const TIDListingForPreAuth = ({ setShowGenerateModal }) => {
                     <input className="form-check-input" type="checkbox" id="select-all" />
                   </div>
                 </th>
-                <th>Beneficiary TID</th>
-                <th>Name</th>
-                <th>Admission Type</th>
-                <th>Identity Type</th>
-                <th>Enrollment Date</th>
+                <th 
+                  onClick={() => handleSort('tid')}
+                  style={{ cursor: 'pointer' }}
+                  className="sortable-header"
+                >
+                  Beneficiary TID {getSortIcon('tid')}
+                </th>
+                <th 
+                  onClick={() => handleSort('name')}
+                  style={{ cursor: 'pointer' }}
+                  className="sortable-header"
+                >
+                  Name {getSortIcon('name')}
+                </th>
+                <th 
+                  onClick={() => handleSort('admissionType')}
+                  style={{ cursor: 'pointer' }}
+                  className="sortable-header"
+                >
+                  Admission Type {getSortIcon('admissionType')}
+                </th>
+                <th 
+                  onClick={() => handleSort('identityType')}
+                  style={{ cursor: 'pointer' }}
+                  className="sortable-header"
+                >
+                  Identity Type {getSortIcon('identityType')}
+                </th>
+                <th 
+                  onClick={() => handleSort('enrollmentDate')}
+                  style={{ cursor: 'pointer' }}
+                  className="sortable-header"
+                >
+                  Enrollment Date {getSortIcon('enrollmentDate')}
+                </th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -106,7 +175,9 @@ const TIDListingForPreAuth = ({ setShowGenerateModal }) => {
                   <td>{row.identityType}</td>
                   <td>{row.enrollmentDate}</td>
                   <td>
-                    <button className="btn btn-sm btn-success" onClick={() => handlePreAuthClick(row)}
+                    <button 
+                      className="btn btn-sm btn-success" 
+                      onClick={() => handlePreAuthClick(row)}
                     >
                       <i className="bi bi-arrow-right" /> Pre Authorization
                     </button>
@@ -127,7 +198,7 @@ const TIDListingForPreAuth = ({ setShowGenerateModal }) => {
               <li className="page-item"><a className="page-link" href="#">3</a></li>
               <li className="page-item"><a className="page-link" href="#">Next</a></li>
             </ul>
-            <div className="d-flex align-items-center">
+            <div className="d-flex align-items-center justify-content-center">
               <span className="me-2">Show</span>
               <select
                 className="form-select form-select-sm"
@@ -144,7 +215,7 @@ const TIDListingForPreAuth = ({ setShowGenerateModal }) => {
             </div>
           </nav>
           <p className="text-muted mb-0">
-            Showing {((currentPage - 1) * recordsPerPage) + 1} to {Math.min(currentPage * recordsPerPage, tableData.length)} of {tableData.length} entries
+            Showing {((currentPage - 1) * recordsPerPage) + 1} to {Math.min(currentPage * recordsPerPage, sortedData.length)} of {sortedData.length} entries
           </p>
         </div>
 
@@ -154,8 +225,6 @@ const TIDListingForPreAuth = ({ setShowGenerateModal }) => {
           handleClose={() => setShowPreAuthModal(false)}
           patient={selectedPatient}
         />
-
-
       </div>
     </div>
   );
