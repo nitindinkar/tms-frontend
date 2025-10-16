@@ -8,6 +8,9 @@ const Layout =  React.lazy(() => import('./Pages/layout/index'));
 const Login =  React.lazy(() => import('./Pages/login/index'));
 const BeneficiaryIdentification =  React.lazy(() => import('./Pages/beneficiaryIdentification/index'));
 const PreAuthorization =  React.lazy(() => import('./Pages/pre-Authorization/index'));
+const PreAuthorizationDecision = React.lazy(() => import('./Pages/pre-Authorization-Decision/index'));
+
+
 const isAuthenticated = () => {
   // Replace this with real authentication check logic
  // return Cookies.get('isAuthenticated') === "true";
@@ -28,8 +31,7 @@ function App() {
           <Route path="/" element={<PrivateRoute element={<Layout />} />}>
           <Route path="beneficiary-identification" element={<BeneficiaryIdentification />} />
           <Route path="pre-authorization" element={<PreAuthorization />} />
-
-
+          <Route path='pre-authorization-decision' element={<PreAuthorizationDecision/>} />
             
           </Route>
         </Routes>
