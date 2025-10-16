@@ -1,18 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import ReportDownload from './reportDownload';
-
+import ReportDownload from "./reportDownload";
 
 const TIDListing = ({ setShowGenerateModal }) => {
   const [recordsPerPage, setRecordsPerPage] = useState(5);
   const [currentPage, setCurrentPage] = useState(1);
 
   const tableData = [
-    { tid: '123456789010', name: 'Bhagirath Prajapat', mobile: '9876543210', age: 38, status: 'Active' },
-    { tid: '123456789011', name: 'Rahul chauhan', mobile: '9876543211', age: 40, status: 'Active' },
-    { tid: '123456789012', name: 'Ravindra Kumar', mobile: '9876543212', age: 52, status: 'Pending' },
-    { tid: '123456789013', name: 'Shanti Kumari', mobile: '9876543213', age: 38, status: 'Active' },
-    { tid: '123456789014', name: 'Bhagirath Prajapat', mobile: '9876543210', age: 38, status: 'Active' },
+    {
+      tid: "123456789010",
+      name: "Bhagirath Prajapat",
+      mobile: "9876543210",
+      age: 38,
+      status: "Active",
+    },
+    {
+      tid: "123456789011",
+      name: "Rahul chauhan",
+      mobile: "9876543211",
+      age: 40,
+      status: "Active",
+    },
+    {
+      tid: "123456789012",
+      name: "Ravindra Kumar",
+      mobile: "9876543212",
+      age: 52,
+      status: "Pending",
+    },
+    {
+      tid: "123456789013",
+      name: "Shanti Kumari",
+      mobile: "9876543213",
+      age: 38,
+      status: "Active",
+    },
+    {
+      tid: "123456789014",
+      name: "Bhagirath Prajapat",
+      mobile: "9876543210",
+      age: 38,
+      status: "Active",
+    },
   ];
 
   const handleRecordsPerPageChange = (e) => {
@@ -70,17 +99,10 @@ const TIDListing = ({ setShowGenerateModal }) => {
           <table className="table table-hover">
             <thead>
               <tr>
-                <th>
-                  <div className="form-check">
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      id="select-all"
-                    />
-                  </div>
-                </th>
+                <th>SNo.</th>
                 <th data-sort="tid">
-                  Beneficiary TID <i className="bi bi-arrow-down-up sort-icon" />
+                  Beneficiary TID{" "}
+                  <i className="bi bi-arrow-down-up sort-icon" />
                 </th>
                 <th data-sort="name">
                   Name <i className="bi bi-arrow-down-up sort-icon" />
@@ -97,14 +119,7 @@ const TIDListing = ({ setShowGenerateModal }) => {
             <tbody>
               {paginatedData.map((row, index) => (
                 <tr key={index}>
-                  <td>
-                    <div className="form-check">
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                      />
-                    </div>
-                  </td>
+                  <td>{index + 1}</td>
                   <td>{row.tid}</td>
                   <td>{row.name}</td>
                   <td>{row.mobile}</td>
@@ -121,7 +136,10 @@ const TIDListing = ({ setShowGenerateModal }) => {
         </div>
         {/* Table Footer with Pagination and Records Per Page Dropdown */}
         <div className="table-footer">
-          <nav aria-label="Page navigation" className="d-flex align-items-center">
+          <nav
+            aria-label="Page navigation"
+            className="d-flex align-items-center"
+          >
             <ul className="pagination mb-0 me-3">
               <li className="page-item disabled">
                 <a className="page-link" href="#">
@@ -176,7 +194,9 @@ const TIDListing = ({ setShowGenerateModal }) => {
             </div>
           </nav>
           <p className="text-muted mb-0">
-            Showing {((currentPage - 1) * recordsPerPage) + 1} to {Math.min(currentPage * recordsPerPage, tableData.length)} of {tableData.length} entries
+            Showing {(currentPage - 1) * recordsPerPage + 1} to{" "}
+            {Math.min(currentPage * recordsPerPage, tableData.length)} of{" "}
+            {tableData.length} entries
           </p>
         </div>
       </div>

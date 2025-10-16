@@ -22,8 +22,8 @@ const GenerateTidModal = ({
   const fileInputRef = useRef(null);
   const [photoSaved, setPhotoSaved] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
-  const [skipContactDetail, setSkipStep2] = useState(false);
-  const [skipMemberDetail, setSkipStep3] = useState(false);
+  const [skipContactDetail, setSkipContactDetail] = useState(false);
+  const [skipMemberDetail, setSkipMemberDetail] = useState(false);
   const [errors, setErrors] = useState({});
   const [beneficiaryData, setBeneficiaryData] = useState({
     entitlementType: "APL",
@@ -54,7 +54,7 @@ const GenerateTidModal = ({
         category: "OBC",
         isAadhaarVerified: 1,
         verifyMethod: "OTP",
-        verifyStatus: 1,
+        verifyStatus: 0,
         aadhaarHitCount: 2,
         fmrReqCount: 1,
         assessmentYear: "2024-25",
@@ -243,8 +243,8 @@ const GenerateTidModal = ({
   useEffect(() => {
     if (!show) {
       setCurrentStep(1);
-      setSkipStep2(false);
-      setSkipStep3(false);
+      setSkipContactDetail(false);
+      setSkipMemberDetail(false);
     }
   }, [show]);
 
@@ -252,14 +252,14 @@ const GenerateTidModal = ({
   useEffect(() => {
     if (formData.admissionType === "normal") {
       // For normal admission: skip step 2 only if no Jan Aadhaar
-      setSkipStep2(!formData.hasJanAadhaar);
-      setSkipStep3(false);
+      setSkipContactDetail(!formData.isJanAadhaarId);
+      setSkipMemberDetail(false);
     } else if (formData.admissionType === "emergency") {
       // For emergency admission: skip both step 2 and step 3
-      setSkipStep2(true);
-      setSkipStep3(true);
+      setSkipContactDetail(true);
+      setSkipMemberDetail(true);
     }
-  }, [formData?.hasJanAadhaar, formData.admissionType]);
+  }, [formData?.isJanAadhaarId, formData.admissionType]);
 
   // Single select handler for checkbox groups
   const handleSingleSelect = (fieldName, value) => {
@@ -277,16 +277,18 @@ const GenerateTidModal = ({
     if (currentStep < 4) {
       let nextStep = currentStep + 1;
 
+      // ✅ Emergency admission: directly generate TID (no photo step)
+      if (formData.admissionType === "emergency") {
+        generateTid(); // directly call success modal
+        return; // stop here, no step progression
+      }
+
       if (currentStep === 1) {
-        // CASE 1: Emergency (skip contact + member)
-        if (skipContactDetail && skipMemberDetail) {
-          nextStep = 4;
-        }
-        // CASE 2: Normal admission but no Jan Aadhaar (skip contact only)
-        else if (skipContactDetail && !skipMemberDetail) {
+        // CASE 1: Normal admission but no Jan Aadhaar (skip contact only)
+        if (skipContactDetail && !skipMemberDetail) {
           nextStep = 3;
         }
-        // ✅ CASE 3: Normal admission WITH Jan Aadhaar → call API before moving ahead
+        // CASE 2: Normal admission WITH Jan Aadhaar → call API before moving ahead
         else if (!skipContactDetail && !skipMemberDetail) {
           if (
             formData.admissionType === "normal" &&
@@ -294,14 +296,11 @@ const GenerateTidModal = ({
             formData.identityNumber
           ) {
             console.log("Calling getSearchBeneficiary()...");
-            // getSearchBeneficiary(); // call your function here
+            // getSearchBeneficiary();
           }
         }
       }
-      // CASE 4: Skip step 3 for emergency
-      else if (currentStep === 2 && skipMemberDetail) {
-        nextStep = 4;
-      }
+      // CASE 3: Skip step 3 for emergency — handled above already
 
       setCurrentStep(nextStep);
     }
@@ -336,14 +335,17 @@ const GenerateTidModal = ({
 
   // Determine which steps to display in the step indicator
   const getStepsToDisplay = () => {
-    if (skipContactDetail && skipMemberDetail) {
-      // Emergency case: show only step 1 and step 4
+    if (formData.admissionType === "emergency") {
+      // ✅ Only show first step (no photo capture)
+      return [{ number: 1, label: "Search Beneficiary", actualStep: 1 }];
+    } else if (skipContactDetail && skipMemberDetail) {
+      // Normal but skipping both (theoretically shouldn't happen now)
       return [
         { number: 1, label: "Search Beneficiary", actualStep: 1 },
         { number: 2, label: "Capture Photograph", actualStep: 4 },
       ];
     } else if (skipContactDetail && !skipMemberDetail) {
-      // Normal admission without Jan Aadhaar: skip step 2
+      // Normal admission without Jan Aadhaar: skip contact only
       return [
         { number: 1, label: "Search Beneficiary", actualStep: 1 },
         { number: 2, label: "Instant Beneficiary", actualStep: 3 },
@@ -419,10 +421,10 @@ const GenerateTidModal = ({
                     <input
                       className="form-check-input single-select"
                       type="checkbox"
-                      name="rtaCase"
+                      name="isRta"
                       id="rta-no"
-                      checked={formData.rtaCase === "no"}
-                      onChange={() => handleSingleSelect("rtaCase", "no")}
+                      checked={formData.isRta === "no"}
+                      onChange={() => handleSingleSelect("isRta", "no")}
                     />
                     <label className="form-check-label" htmlFor="rta-no">
                       No
@@ -432,10 +434,10 @@ const GenerateTidModal = ({
                     <input
                       className="form-check-input single-select"
                       type="checkbox"
-                      name="rtaCase"
+                      name="isRta"
                       id="rta-yes"
-                      checked={formData.rtaCase === "yes"}
-                      onChange={() => handleSingleSelect("rtaCase", "yes")}
+                      checked={formData.isRta === "yes"}
+                      onChange={() => handleSingleSelect("isRta", "yes")}
                     />
                     <label className="form-check-label" htmlFor="rta-yes">
                       Yes
@@ -497,11 +499,11 @@ const GenerateTidModal = ({
                       <input
                         className="form-check-input single-select"
                         type="checkbox"
-                        name="hasJanAadhaar"
+                        name="isJanAadhaarId"
                         id="jan-yes"
-                        checked={formData?.hasJanAadhaar === true}
+                        checked={formData?.isJanAadhaarId === true}
                         onChange={() =>
-                          handleSingleSelect("hasJanAadhaar", true)
+                          handleSingleSelect("isJanAadhaarId", true)
                         }
                       />
                       <label className="form-check-label" htmlFor="jan-yes">
@@ -512,11 +514,11 @@ const GenerateTidModal = ({
                       <input
                         className="form-check-input single-select"
                         type="checkbox"
-                        name="hasJanAadhaar"
+                        name="isJanAadhaarId"
                         id="jan-no"
-                        checked={formData?.hasJanAadhaar === false}
+                        checked={formData?.isJanAadhaarId === false}
                         onChange={() =>
-                          handleSingleSelect("hasJanAadhaar", false)
+                          handleSingleSelect("isJanAadhaarId", false)
                         }
                       />
                       <label className="form-check-label" htmlFor="jan-no">
@@ -524,7 +526,7 @@ const GenerateTidModal = ({
                       </label>
                     </div>
                   </div>
-                  {!formData?.hasJanAadhaar && (
+                  {!formData?.isJanAadhaarId && (
                     <div className="alert alert-info mt-2 small">
                       <i className="bi bi-info-circle"></i> Step 2 will be
                       skipped as you don't have Jan Aadhaar ID.
@@ -547,8 +549,8 @@ const GenerateTidModal = ({
                       <label className="form-label">Patient Name</label>
                       <input
                         type="text"
-                        name="patientName"
-                        value={formData.patientName}
+                        name="patientNameEnglish"
+                        value={formData.patientNameEnglish}
                         onChange={handleChange}
                         className="form-control"
                         placeholder="Enter patient name"
@@ -558,10 +560,10 @@ const GenerateTidModal = ({
                       <label className="form-label">Age</label>
                       <input
                         type="number"
-                        name="patientAge"
+                        name="age"
                         className="form-control"
                         placeholder="Age"
-                        value={formData.patientAge}
+                        value={formData.age}
                         onChange={handleChange}
                       />
                     </div>
@@ -679,11 +681,11 @@ const GenerateTidModal = ({
                           <input
                             className="form-check-input single-select"
                             type="checkbox"
-                            name="isPatientIdentified"
+                            name="isPatientIdentify"
                             id="patient-unidentified"
-                            checked={formData.isPatientIdentified === false}
+                            checked={formData.isPatientIdentify === false}
                             onChange={() =>
-                              handleSingleSelect("isPatientIdentified", false)
+                              handleSingleSelect("isPatientIdentify", false)
                             }
                           />
                           <label
@@ -697,11 +699,11 @@ const GenerateTidModal = ({
                           <input
                             className="form-check-input single-select"
                             type="checkbox"
-                            name="isPatientIdentified"
+                            name="isPatientIdentify"
                             id="patient-identified"
-                            checked={formData.isPatientIdentified === true}
+                            checked={formData.isPatientIdentify === true}
                             onChange={() =>
-                              handleSingleSelect("isPatientIdentified", true)
+                              handleSingleSelect("isPatientIdentify", true)
                             }
                           />
                           <label
@@ -716,7 +718,7 @@ const GenerateTidModal = ({
                   </div>
 
                   {/* Identification Details - Conditionally Rendered */}
-                  {formData.isPatientIdentified && (
+                  {formData.isPatientIdentify && (
                     <div
                       id="identification-details"
                       className="identification-details bg-light rounded"
@@ -730,9 +732,9 @@ const GenerateTidModal = ({
                           <input
                             type="text"
                             className="form-control"
-                            name="identifierName"
+                            name="personNameIdentifyPatient"
                             placeholder="Enter name"
-                            value={formData.identifierName}
+                            value={formData.personNameIdentifyPatient}
                             onChange={handleChange}
                           />
                         </div>
@@ -745,7 +747,7 @@ const GenerateTidModal = ({
                             className="form-control"
                             name="relationshipWithPatient"
                             placeholder="Enter relationship"
-                            value={formData.relationshipWithPatient}
+                            value={formData.relationWithPatient}
                             onChange={handleChange}
                           />
                         </div>
@@ -753,10 +755,10 @@ const GenerateTidModal = ({
                           <label className="form-label">Contact No.</label>
                           <input
                             type="tel"
-                            name="identifierContact"
+                            name="personContactNo"
                             className="form-control"
                             placeholder="Enter contact number"
-                            value={formData.identifierContact}
+                            value={formData.personContactNo}
                             onChange={handleChange}
                           />
                         </div>
@@ -768,59 +770,60 @@ const GenerateTidModal = ({
             )}
 
             {/* Identity Details - Conditionally Shown */}
-            {formData?.hasJanAadhaar && formData.admissionType === "normal" && (
-              <div className="row">
-                <div className="col-md-4 mb-2">
-                  <label className="form-label">
-                    Identity Type <span className="text-danger">*</span>
-                  </label>
-                  <select
-                    className={`form-select ${
-                      errors.identityType ? "is-invalid" : ""
-                    }`}
-                    name="identityType"
-                    value={formData.identityType}
-                    onChange={handleChange}
-                  >
-                    <option value="">Select Identity Type</option>
-                    {IDENTITY_TYPES.map((type) => (
-                      <option
-                        key={type.identityTypeId}
-                        value={type.identityTypeId}
-                      >
-                        {type.description}
-                      </option>
-                    ))}
-                  </select>
-                  {errors.identityType && (
-                    <div className="invalid-feedback">
-                      {errors.identityType}
-                    </div>
-                  )}
-                </div>
+            {formData?.isJanAadhaarId &&
+              formData.admissionType === "normal" && (
+                <div className="row">
+                  <div className="col-md-4 mb-2">
+                    <label className="form-label">
+                      Identity Type <span className="text-danger">*</span>
+                    </label>
+                    <select
+                      className={`form-select ${
+                        errors.identityType ? "is-invalid" : ""
+                      }`}
+                      name="identityType"
+                      value={formData.identityType}
+                      onChange={handleChange}
+                    >
+                      <option value="">Select Identity Type</option>
+                      {IDENTITY_TYPES.map((type) => (
+                        <option
+                          key={type.identityTypeId}
+                          value={type.identityTypeId}
+                        >
+                          {type.description}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.identityType && (
+                      <div className="invalid-feedback">
+                        {errors.identityType}
+                      </div>
+                    )}
+                  </div>
 
-                <div className="col-md-4 mb-2">
-                  <label className="form-label">
-                    Identity Number <span className="text-danger">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    className={`form-control ${
-                      errors.identityNumber ? "is-invalid" : ""
-                    }`}
-                    name="identityNumber"
-                    value={formData.identityNumber}
-                    onChange={handleChange}
-                    placeholder="Enter Identity Number"
-                  />
-                  {errors.identityNumber && (
-                    <div className="invalid-feedback">
-                      {errors.identityNumber}
-                    </div>
-                  )}
+                  <div className="col-md-4 mb-2">
+                    <label className="form-label">
+                      Identity Number <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      className={`form-control ${
+                        errors.identityNumber ? "is-invalid" : ""
+                      }`}
+                      name="identityNumber"
+                      value={formData.identityNumber}
+                      onChange={handleChange}
+                      placeholder="Enter Identity Number"
+                    />
+                    {errors.identityNumber && (
+                      <div className="invalid-feedback">
+                        {errors.identityNumber}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
           </div>
         )}
 
@@ -926,7 +929,7 @@ const GenerateTidModal = ({
 
         {currentStep === 3 && (
           <div className="tab-pane fade show active">
-            {formData?.hasJanAadhaar && (
+            {formData?.isJanAadhaarId && (
               <>
                 <h4 className="step-heading">Member Details of Beneficiary</h4>
                 {/* Verify By Field */}
@@ -1126,7 +1129,7 @@ const GenerateTidModal = ({
             )}
 
             {/* Instant Beneficiary Form - Conditionally Rendered */}
-            {!formData?.hasJanAadhaar &&
+            {!formData?.isJanAadhaarId &&
               formData.admissionType === "normal" && (
                 <div id="instant-beneficiary-form">
                   <h5 className="step-heading">Instant Beneficiary Details</h5>
@@ -1138,10 +1141,10 @@ const GenerateTidModal = ({
                       </label>
                       <input
                         type="text"
-                        name="patientName"
+                        name="patientNameEnglish"
                         className="form-control"
                         placeholder="Enter patient name"
-                        value={formData.patientName}
+                        value={formData.patientNameEnglish}
                         onChange={handleChange}
                       />
                     </div>
@@ -1150,7 +1153,7 @@ const GenerateTidModal = ({
                       <label className="form-label">Age</label>
                       <input
                         type="number"
-                        name="patientAge"
+                        name="age"
                         className="form-control"
                         placeholder="Age"
                         value={formData.age}
@@ -1742,7 +1745,7 @@ const GenerateTidModal = ({
             <i className="bi bi-arrow-left"></i> Back
           </Button>
         )}
-        {currentStep < 4 ? (
+        {currentStep < 4 && formData.admissionType === "normal" ? (
           <Button type="button" variant="success" onClick={nextStepFunc}>
             Next <i className="bi bi-arrow-right"></i>
           </Button>
