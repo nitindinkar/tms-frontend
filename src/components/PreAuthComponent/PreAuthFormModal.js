@@ -164,6 +164,14 @@ const PreAuthFormModal = ({ show, handleClose }) => {
     }));
   };
 
+  // Scroll to top of modal body
+  const scrollModalToTop = () => {
+    const modalBody = document.querySelector('.modal-body');
+    if (modalBody) {
+      modalBody.scrollTop = 0;
+    }
+  };
+
   // Calculate booked amount based on surgical package rules
   const calculateBookedAmount = (selectedPackages, newPackage) => {
     const surgicalPackages = selectedPackages.filter(pkg => pkg.isSurgical);
@@ -415,12 +423,14 @@ const PreAuthFormModal = ({ show, handleClose }) => {
   const nextStep = () => {
     if (currentStep < 3) {
       setCurrentStep(currentStep + 1);
+      scrollModalToTop();
     }
   };
 
   const prevStep = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
+      scrollModalToTop();
     }
   };
 
@@ -434,6 +444,9 @@ const PreAuthFormModal = ({ show, handleClose }) => {
         timer: 2000,
         showConfirmButton: false
       });
+      
+      // Scroll to top to show the alert message properly
+      scrollModalToTop();
       return;
     }
 
@@ -518,6 +531,7 @@ const PreAuthFormModal = ({ show, handleClose }) => {
     { number: 3, label: "Document Upload", actualStep: 3 }
   ];
 
+  
   return (
     <Modal
       show={show}
@@ -527,6 +541,7 @@ const PreAuthFormModal = ({ show, handleClose }) => {
       centered
       scrollable
       backdrop="static"
+      keyboard={false}
     >
       <Modal.Header closeButton className="bg-light">
         <Modal.Title>Pre Authorization Request Form</Modal.Title>
@@ -1168,7 +1183,7 @@ const PreAuthFormModal = ({ show, handleClose }) => {
       </Modal.Body>
 
       <Modal.Footer className="bg-light">
-        <Button variant="outline-secondary" onClick={handleClose}>
+        <Button variant="secondary" onClick={handleClose}>
           Close
         </Button>
         

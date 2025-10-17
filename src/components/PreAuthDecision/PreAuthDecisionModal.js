@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Modal, Table, Form, Button, Row, Col, Dropdown, Card } from "react-bootstrap";
 import Badge from "react-bootstrap/Badge";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -7,6 +7,8 @@ import Swal from "sweetalert2";
 
 const PreAuthDecisionModal = ({ show, handleClose }) => {
   const [currentStep, setCurrentStep] = useState(1);
+  const [validationErrors, setValidationErrors] = useState({});
+  const modalBodyRef = useRef(null);
   
   // Define initial form data based on screenshots
   const initialFormData = {
@@ -44,12 +46,12 @@ const PreAuthDecisionModal = ({ show, handleClose }) => {
     hospitalAddress: "",
     doctorName: "",
     
-    // Step 2 - Package Details (from screenshots 10.jpg and 11.jpg)
-    selectedPackages: [],
-    
-    // Step 3 - Documents & Previous History (from screenshots 10.jpg and 13.jpg)
+    // Step 2 - Documents & Previous History (from screenshots 10.jpg and 13.jpg)
     documents: [],
-    finalRemarks: ""
+    finalRemarks: "",
+    
+    // Step 3 - Package Details (from screenshots 10.jpg and 11.jpg)
+    selectedPackages: []
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -74,11 +76,19 @@ const PreAuthDecisionModal = ({ show, handleClose }) => {
         file: null,
         remarks: ""
       });
+      setValidationErrors({});
     } else {
       // Load mock data when modal opens
       loadMockData();
     }
   }, [show]);
+
+  // Scroll to top when step changes
+  useEffect(() => {
+    if (modalBodyRef.current) {
+      modalBodyRef.current.scrollTop = 0;
+    }
+  }, [currentStep]);
 
   // Mock data for hospitals
   const hospitals = [
@@ -123,6 +133,8 @@ const PreAuthDecisionModal = ({ show, handleClose }) => {
         action: "",
         prescribingDoctor: "DOC Q&TXT PolyPhv4jph",
         remarks: "MC20402400203402040204862048042040204060204202",
+        reason: "", // Add reason field
+        reply: ""
       }
     ];
 
@@ -156,6 +168,14 @@ const PreAuthDecisionModal = ({ show, handleClose }) => {
     updatedPackages[index].status = action;
     updatedPackages[index].action = action;
     
+    // Clear validation error when action changes
+    const errorKey = `package-${index}-reason`;
+    if (validationErrors[errorKey]) {
+      const newErrors = { ...validationErrors };
+      delete newErrors[errorKey];
+      setValidationErrors(newErrors);
+    }
+    
     setFormData(prev => ({
       ...prev,
       selectedPackages: updatedPackages
@@ -169,6 +189,37 @@ const PreAuthDecisionModal = ({ show, handleClose }) => {
         i === index ? { ...pkg, [field]: value } : pkg
       )
     }));
+
+    // Clear validation error when reason is filled
+    if (field === 'reason' && value.trim()) {
+      const errorKey = `package-${index}-reason`;
+      if (validationErrors[errorKey]) {
+        const newErrors = { ...validationErrors };
+        delete newErrors[errorKey];
+        setValidationErrors(newErrors);
+      }
+    }
+  };
+
+  // Check if any package has pending status
+  const hasPendingPackages = () => {
+    return formData.selectedPackages.some(pkg => 
+      pkg.status === 'Pending' || pkg.status === '' || !pkg.status
+    );
+  };
+
+  // Validate package reasons before submission
+  const validatePackageReasons = () => {
+    const errors = {};
+    
+    formData.selectedPackages.forEach((pkg, index) => {
+      if ((pkg.status === 'Rejected' || pkg.status === 'Query') && !pkg.reason?.trim()) {
+        errors[`package-${index}-reason`] = 'Reason is required for Rejected or Query packages';
+      }
+    });
+    
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   // Get badge color based on status
@@ -276,6 +327,30 @@ const PreAuthDecisionModal = ({ show, handleClose }) => {
   };
 
   const handleSubmit = () => {
+    // Check if any package is still pending
+    if (hasPendingPackages()) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Pending Packages',
+        text: 'Please make a decision (Approve, Reject, or Query) for all packages before submitting.',
+        timer: 3000,
+        showConfirmButton: true
+      });
+      return;
+    }
+
+    // Validate package reasons first
+    if (!validatePackageReasons()) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Validation Error',
+        text: 'Please provide reasons for all Rejected or Query packages',
+        timer: 3000,
+        showConfirmButton: true
+      });
+      return;
+    }
+
     // Validate before submit
     if (formData.selectedPackages.length === 0) {
       Swal.fire({
@@ -301,15 +376,38 @@ const PreAuthDecisionModal = ({ show, handleClose }) => {
     handleClose();
   };
 
-  // Steps definition
+  // Steps definition - SWAPPED Step 2 and Step 3
   const steps = [
     { number: 1, label: "Patient & Hospital Details", actualStep: 1 },
-    { number: 2, label: "Wallet & Package Details", actualStep: 2 },
-    { number: 3, label: "Documents & History", actualStep: 3 }
+    { number: 2, label: "Documents & History", actualStep: 2 },
+    { number: 3, label: "Wallet & Package Details", actualStep: 3 }
   ];
 
   // Mock data for previous hospitalization (from screenshot 10.jpg and 13.jpg)
-  const previousHospitalizations = [];
+  const previousHospitalizations = [
+    {
+      tid: "TID202312001",
+      patientName: "Rajesh Kumar",
+      admissionDate: "15/12/2023",
+      hospitalName: "SMS Hospital Jaipur",
+      pkgCode: "1450-GA001-01",
+      pkgName: "General Abdominal Surgery - Laparoscopic",
+      pkgCost: "₹85,000",
+      status: "Discharged",
+      assYear: "2023-24"
+    },
+    {
+      tid: "TID202308045",
+      patientName: "Rajesh Kumar",
+      admissionDate: "10/08/2023",
+      hospitalName: "JLN Hospital Ajmer",
+      pkgCode: "1320-CA002-00",
+      pkgName: "Cardiac Assessment & Basic Treatment",
+      pkgCost: "₹45,500",
+      status: "Discharged",
+      assYear: "2023-24"
+    }
+  ];
 
   return (
     <Modal
@@ -326,7 +424,10 @@ const PreAuthDecisionModal = ({ show, handleClose }) => {
         <Modal.Title>Pre Authorization Decision</Modal.Title>
       </Modal.Header>
 
-      <Modal.Body style={{ maxHeight: '80vh', overflowY: 'auto' }}>
+      <Modal.Body 
+        ref={modalBodyRef}
+        style={{ maxHeight: '80vh', overflowY: 'auto' }}
+      >
         {/* Step Indicator */}
         <div className="step-indicator mb-4">
           {steps.map((step) => (
@@ -667,10 +768,281 @@ const PreAuthDecisionModal = ({ show, handleClose }) => {
           </div>
         )}
 
-        {/* Step 2: Package Details */}
+        {/* Step 2: Documents & History (SWAPPED - now Step 2) */}
         {currentStep === 2 && (
           <div className="tab-pane fade show active">
+            <h4 className="step-heading mb-4">Documents & Previous History</h4>
+            
+            {/* Uploaded Documents Section - Display only documents from pre-auth request */}
+            <Card className="mb-4">
+              <Card.Header className="bg-light">
+                <h6 className="mb-0">Uploaded Documents from Pre-Authorization Request</h6>
+              </Card.Header>
+              <Card.Body>
+                <div className="table-responsive">
+                  <Table striped bordered hover>
+                    <thead className="table-light">
+                      <tr>
+                        <th>S.no.</th>
+                        <th>Document Name</th>
+                        <th>Document Type</th>
+                        <th>Upload Date</th>
+                        <th>Download</th>
+                        <th>Remarks</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {/* Patient Photo */}
+                      <tr>
+                        <td className="text-center fw-bold">1</td>
+                        <td>
+                          <div className="d-flex align-items-center">
+                            <i className="bi bi-image text-primary me-2"></i>
+                            <span>patient_photo.jpg</span>
+                          </div>
+                        </td>
+                        <td>
+                          <Badge bg="info">Patient Photo</Badge>
+                        </td>
+                        <td>2024-01-15 10:30 AM</td>
+                        <td>
+                          <div className="d-flex gap-2">
+                            <Button
+                              variant="outline-success"
+                              size="sm"
+                              onClick={() => {
+                                Swal.fire({
+                                  icon: 'success',
+                                  title: 'Download Started',
+                                  text: 'patient_photo.jpg is being downloaded',
+                                  timer: 1500,
+                                  showConfirmButton: false
+                                });
+                              }}
+                            >
+                              <i className="bi bi-download me-1"></i>
+                              Download
+                            </Button>
+                          </div>
+                        </td>
+                        <td>
+                          <small>Patient identification photo for verification</small>
+                        </td>
+                      </tr>
+                      
+                      {/* Doctor Prescription */}
+                      <tr>
+                        <td className="text-center fw-bold">2</td>
+                        <td>
+                          <div className="d-flex align-items-center">
+                            <i className="bi bi-file-medical text-danger me-2"></i>
+                            <span>doctor_prescription.pdf</span>
+                          </div>
+                        </td>
+                        <td>
+                          <Badge bg="warning">Doctor Prescription</Badge>
+                        </td>
+                        <td>2024-01-15 10:32 AM</td>
+                        <td>
+                          <div className="d-flex gap-2">
+                            <Button
+                              variant="outline-success"
+                              size="sm"
+                              onClick={() => {
+                                Swal.fire({
+                                  icon: 'success',
+                                  title: 'Download Started',
+                                  text: 'doctor_prescription.pdf is being downloaded',
+                                  timer: 1500,
+                                  showConfirmButton: false
+                                });
+                              }}
+                            >
+                              <i className="bi bi-download me-1"></i>
+                              Download
+                            </Button>
+                          </div>
+                        </td>
+                        <td>
+                          <small>Initial prescription for conservative management</small>
+                        </td>
+                      </tr>
+                      
+                      {/* Admission Note */}
+                      <tr>
+                        <td className="text-center fw-bold">3</td>
+                        <td>
+                          <div className="d-flex align-items-center">
+                            <i className="bi bi-file-text text-success me-2"></i>
+                            <span>admission_note.pdf</span>
+                          </div>
+                        </td>
+                        <td>
+                          <Badge bg="success">Admission Note</Badge>
+                        </td>
+                        <td>2024-01-15 09:15 AM</td>
+                        <td>
+                          <div className="d-flex gap-2">
+                            <Button
+                              variant="outline-success"
+                              size="sm"
+                            >
+                              <i className="bi bi-download me-1"></i>
+                              Download
+                            </Button>
+                          </div>
+                        </td>
+                        <td>
+                          <small>Initial admission assessment and notes</small>
+                        </td>
+                      </tr>
+                      
+                      {/* Lab Reports */}
+                      <tr>
+                        <td className="text-center fw-bold">4</td>
+                        <td>
+                          <div className="d-flex align-items-center">
+                            <i className="bi bi-graph-up text-warning me-2"></i>
+                            <span>lab_reports.pdf</span>
+                          </div>
+                        </td>
+                        <td>
+                          <Badge bg="secondary">Lab Reports</Badge>
+                        </td>
+                        <td>2024-01-14 03:45 PM</td>
+                        <td>
+                          <div className="d-flex gap-2">
+                            <Button
+                              variant="outline-success"
+                              size="sm"
+                            >
+                              <i className="bi bi-download me-1"></i>
+                              Download
+                            </Button>
+                          </div>
+                        </td>
+                        <td>
+                          <small>Complete blood work and biochemistry reports</small>
+                        </td>
+                      </tr>
+                      
+                      {/* ID Proof */}
+                      <tr>
+                        <td className="text-center fw-bold">5</td>
+                        <td>
+                          <div className="d-flex align-items-center">
+                            <i className="bi bi-person-badge text-primary me-2"></i>
+                            <span>aadhaar_card.pdf</span>
+                          </div>
+                        </td>
+                        <td>
+                          <Badge bg="primary">ID Proof</Badge>
+                        </td>
+                        <td>2024-01-15 10:25 AM</td>
+                        <td>
+                          <div className="d-flex gap-2">
+                            <Button
+                              variant="outline-success"
+                              size="sm"
+                            >
+                              <i className="bi bi-download me-1"></i>
+                              Download
+                            </Button>
+                          </div>
+                        </td>
+                        <td>
+                          <small>Aadhaar card for patient identification</small>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </Table>
+                </div>
+                
+                {/* Document Summary */}
+                <Card className="mt-3 border-primary">
+                  <Card.Body className="py-2">
+                    <Row>
+                      <Col md={6}>
+                        <small className="text-muted">
+                          <i className="bi bi-info-circle me-1"></i>
+                          <strong>Total Documents:</strong> 5 documents uploaded
+                        </small>
+                      </Col>
+                      <Col md={6} className="text-end">
+                        <small className="text-muted">
+                          <i className="bi bi-check-circle text-success me-1"></i>
+                          All required documents are verified
+                        </small>
+                      </Col>
+                    </Row>
+                  </Card.Body>
+                </Card>
+              </Card.Body>
+            </Card>
+
+            {/* Previous Hospitalization - from screenshot 10.jpg and 13.jpg */}
+            <Card className="mb-4">
+              <Card.Header className="bg-light">
+                <h6 className="mb-0">Details of Previous Hospitalization</h6>
+              </Card.Header>
+              <Card.Body>
+                {previousHospitalizations.length > 0 ? (
+                  <div className="table-responsive">
+                    <Table striped bordered hover>
+                      <thead className="table-light">
+                        <tr>
+                          <th>TID</th>
+                          <th>Patient Name</th>
+                          <th>Admission Date</th>
+                          <th>Hospital Name</th>
+                          <th>Pkg Code</th>
+                          <th>Pkg Name</th>
+                          <th>Pkg Cost</th>
+                          <th>Status</th>
+                          <th>Ass-Year</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {previousHospitalizations.map((record, index) => (
+                          <tr key={index}>
+                            <td>{record.tid}</td>
+                            <td>{record.patientName}</td>
+                            <td>{record.admissionDate}</td>
+                            <td>{record.hospitalName}</td>
+                            <td>{record.pkgCode}</td>
+                            <td>{record.pkgName}</td>
+                            <td>{record.pkgCost}</td>
+                            <td>{record.status}</td>
+                            <td>{record.assYear}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </Table>
+                  </div>
+                ) : (
+                  <div className="text-center py-4 text-muted">
+                    <p>No previous hospitalization records found.</p>
+                  </div>
+                )}
+              </Card.Body>
+            </Card>
+          </div>
+        )}
+
+        {/* Step 3: Package Details (SWAPPED - now Step 3) */}
+        {currentStep === 3 && (
+          <div className="tab-pane fade show active">
             <h4 className="step-heading mb-4">Wallet & Package Details</h4>
+            
+            {/* Pending Packages Warning */}
+            {hasPendingPackages() && (
+              <div className="alert alert-warning d-flex align-items-center mb-4" role="alert">
+                <i className="bi bi-exclamation-triangle-fill me-2"></i>
+                <div>
+                  <strong>Pending Packages:</strong> Please make a decision (Approve, Reject, or Query) for all packages before submitting the pre-authorization.
+                </div>
+              </div>
+            )}
             
             {/* Wallet Details - from screenshot 10.jpg and 11.jpg */}
             <Card className="mb-4">
@@ -725,7 +1097,7 @@ const PreAuthDecisionModal = ({ show, handleClose }) => {
                           <th>Prescribing Doctor</th>
                           <th style={{ minWidth: '120px' }}>Actions</th>
                           <th>Remarks</th>
-                          <th>Reason</th>
+                          <th>Reason *</th>
                           <th>Reply</th>
                         </tr>
                       </thead>
@@ -800,7 +1172,25 @@ const PreAuthDecisionModal = ({ show, handleClose }) => {
                                 value={pkg.reason || ''}
                                 onChange={(e) => updatePackageField(index, 'reason', e.target.value)}
                                 placeholder="Enter reason..."
+                                className={
+                                  validationErrors[`package-${index}-reason`] 
+                                    ? 'is-invalid' 
+                                    : (pkg.status === 'Rejected' || pkg.status === 'Query') 
+                                      ? 'border-warning' 
+                                      : ''
+                                }
+                                required={(pkg.status === 'Rejected' || pkg.status === 'Query')}
                               />
+                              {validationErrors[`package-${index}-reason`] && (
+                                <div className="invalid-feedback d-block">
+                                  {validationErrors[`package-${index}-reason`]}
+                                </div>
+                              )}
+                              {(pkg.status === 'Rejected' || pkg.status === 'Query') && !validationErrors[`package-${index}-reason`] && (
+                                <small className="text-warning">
+                                  <i className="bi bi-exclamation-triangle"></i> Required for {pkg.status} packages
+                                </small>
+                              )}
                             </td>
                             <td style={{ minWidth: '200px' }}>
                               <Form.Control
@@ -826,185 +1216,10 @@ const PreAuthDecisionModal = ({ show, handleClose }) => {
             </Card>
           </div>
         )}
-
-        {/* Step 3: Documents & History */}
-        {currentStep === 3 && (
-          <div className="tab-pane fade show active">
-            <h4 className="step-heading mb-4">Documents & Previous History</h4>
-            
-            {/* Document Upload Section - from screenshot 13.jpg */}
-            <Card className="mb-4">
-              <Card.Header className="bg-light">
-                <h6 className="mb-0">Upload Documents</h6>
-              </Card.Header>
-              <Card.Body>
-                <Row className="g-3">
-                  <Col md={4}>
-                    <Form.Label>Document Type:</Form.Label>
-                    <Form.Select
-                      value={documentData.documentType}
-                      onChange={(e) => setDocumentData(prev => ({
-                        ...prev,
-                        documentType: e.target.value
-                      }))}
-                    >
-                      <option value="">Select Document Type</option>
-                      {documentTypes.map(type => (
-                        <option key={type} value={type}>{type}</option>
-                      ))}
-                    </Form.Select>
-                  </Col>
-
-                  <Col md={4}>
-                    <Form.Label>Upload Document:</Form.Label>
-                    <Form.Control
-                      id="documentFile"
-                      type="file"
-                      accept=".pdf,.jpg,.jpeg,.png"
-                      onChange={(e) => setDocumentData(prev => ({
-                        ...prev,
-                        file: e.target.files[0]
-                      }))}
-                    />
-                    <Form.Text className="text-muted">
-                      PDF, JPG, PNG files only (Max 500KB)
-                    </Form.Text>
-                  </Col>
-
-                  <Col md={3}>
-                    <Form.Label>Remarks:</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={documentData.remarks}
-                      onChange={(e) => setDocumentData(prev => ({
-                        ...prev,
-                        remarks: e.target.value
-                      }))}
-                      placeholder="Enter remarks"
-                    />
-                  </Col>
-
-                  <Col md={1} className="d-flex align-items-end">
-                    <Button 
-                      variant="success"
-                      onClick={handleDocumentUpload}
-                      disabled={!documentData.documentType || !documentData.file}
-                      className="w-100"
-                    >
-                      Upload
-                    </Button>
-                  </Col>
-                </Row>
-
-                {/* Uploaded Documents Table */}
-                {formData.documents.length > 0 && (
-                  <div className="mt-4">
-                    <h6>Uploaded Documents</h6>
-                    <Table striped bordered hover size="sm">
-                      <thead>
-                        <tr>
-                          <th>Document Name</th>
-                          <th>Click To Download</th>
-                          <th>Remarks</th>
-                          <th>Action</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {formData.documents.map((doc, index) => (
-                          <tr key={doc.id}>
-                            <td>{doc.type}</td>
-                            <td>
-                              <Button variant="outline-primary" size="sm">
-                                Download {doc.fileName}
-                              </Button>
-                            </td>
-                            <td>{doc.remarks}</td>
-                            <td>
-                              <Button
-                                variant="outline-danger"
-                                size="sm"
-                                onClick={() => removeDocument(index)}
-                              >
-                                Remove
-                              </Button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </Table>
-                  </div>
-                )}
-              </Card.Body>
-            </Card>
-
-            {/* Previous Hospitalization - from screenshot 10.jpg and 13.jpg */}
-            <Card className="mb-4">
-              <Card.Header className="bg-light">
-                <h6 className="mb-0">Details of Previous Hospitalization</h6>
-              </Card.Header>
-              <Card.Body>
-                {previousHospitalizations.length > 0 ? (
-                  <div className="table-responsive">
-                    <Table striped bordered hover>
-                      <thead className="table-light">
-                        <tr>
-                          <th>TID</th>
-                          <th>Patient Name</th>
-                          <th>Admission Date</th>
-                          <th>Hospital Name</th>
-                          <th>Pkg Code</th>
-                          <th>Pkg Name</th>
-                          <th>Pkg Cost</th>
-                          <th>Status</th>
-                          <th>Ass-Year</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {previousHospitalizations.map((record, index) => (
-                          <tr key={index}>
-                            <td>{record.tid}</td>
-                            <td>{record.patientName}</td>
-                            <td>{record.admissionDate}</td>
-                            <td>{record.hospitalName}</td>
-                            <td>{record.pkgCode}</td>
-                            <td>{record.pkgName}</td>
-                            <td>{record.pkgCost}</td>
-                            <td>{record.status}</td>
-                            <td>{record.assYear}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </Table>
-                  </div>
-                ) : (
-                  <div className="text-center py-4 text-muted">
-                    <p>No records found.</p>
-                  </div>
-                )}
-              </Card.Body>
-            </Card>
-
-            {/* Final Remarks */}
-            <Card>
-              <Card.Header className="bg-light">
-                <h6 className="mb-0">Final Remarks</h6>
-              </Card.Header>
-              <Card.Body>
-                <Form.Control
-                  as="textarea"
-                  rows={3}
-                  value={formData.finalRemarks}
-                  onChange={(e) => handleInputChange('finalRemarks', e.target.value)}
-                  placeholder="Enter final remarks for the pre-authorization decision..."
-                />
-              </Card.Body>
-            </Card>
-          </div>
-        )}
       </Modal.Body>
 
       <Modal.Footer className="bg-light">
-        <Button variant="outline-secondary" onClick={handleClose}>
+        <Button variant="secondary" onClick={handleClose}>
           Close
         </Button>
         
@@ -1020,7 +1235,11 @@ const PreAuthDecisionModal = ({ show, handleClose }) => {
               Next <i className="bi bi-arrow-right ms-1"></i>
             </Button>
           ) : (
-            <Button variant="success" onClick={handleSubmit}>
+            <Button 
+              variant="success" 
+              onClick={handleSubmit}
+              disabled={hasPendingPackages()} // Disable submit button if pending packages exist
+            >
               <i className="bi bi-check-circle me-1"></i> Submit Pre-Auth Decision
             </Button>
           )}
