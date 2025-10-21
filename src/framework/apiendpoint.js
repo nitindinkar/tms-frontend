@@ -11,18 +11,15 @@ function getToken() {
   //     console.error("Cookie 'User_auth' not found.");
   //     return null;
   //   }
-
   //   const descryptuserdata = JSON.parse(getUserData);
   //   const parseData = CryptoJs.AES.decrypt(
   //     descryptuserdata.data,
   //     hashkey
   //   ).toString(CryptoJs.enc.Utf8);
-
   //   if (!parseData) {
   //     console.error("Decryption failed.");
   //     return null;
   //   }
-
   //   const parseUserData = JSON.parse(parseData);
   //   // console.log("Extracted token:", parseUserData?.token);
   //   return parseUserData?.token || null;
@@ -32,25 +29,45 @@ function getToken() {
   // }
 }
 // User login API
-// async function loginAPI(username, password, captcha) {
-//   const url = `${apiPath}signin`;
-//   const body = {
-//     username: username,
-//     password: password,
-//     captcha: captcha,
-//   };
-//   const token = CryptoJs.AES.encrypt(JSON.stringify(body), hashkey).toString();
-//   const data = {
-//     data: token,
-//   };
-//   try {
-//     const response = await axios.post(url, data);
-//     return response.data;
-//   } catch (error) {
-//     console.error("API login error:", error);
-//     throw error;
-//   }
-// }
+async function loginAPI(username, password) {
+  const url = `${apiPath}signin`;
+  const body = {
+    username: username,
+    password: password,
+    // captcha: captcha,
+  };
+  // const token = CryptoJs.AES.encrypt(JSON.stringify(body), hashkey).toString();
+  // const data = {
+  //   data: token,
+  // };
+  try {
+    const response = await axios.post(url, body);
+    return response.data;
+  } catch (error) {
+    console.error("API login error:", error);
+    throw error;
+  }
+}
+
+// get beneficiary details by identity type and identity number
+async function getBeneficiaryDetails(identityType, identityNumber) {
+  const url = `${apiPath}/bis/beneficiary/search`;
+  const body = {
+    identityType: identityType,
+    identityNumber: identityNumber,
+  };
+  // const token = CryptoJs.AES.encrypt(JSON.stringify(body), hashkey).toString();
+  // const data = {
+  //   data: token,
+  // };
+  try {
+    const response = await axios.post(url, body);
+    return response.data;
+  } catch (error) {
+    console.error("API login error:", error);
+    throw error;
+  }
+}
 
 // User logout API
 // async function logoutAPI() {
@@ -77,11 +94,10 @@ function getToken() {
 //     console.error("API Logout error:", error);
 //     throw error;
 //   }
-// }
-
-
+//}
 
 // Export all API utilities
 export const apiUtilities = {
-  // loginAPI,
+  loginAPI,
+  getBeneficiaryDetails,
 };
