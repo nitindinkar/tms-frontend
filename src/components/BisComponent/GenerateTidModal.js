@@ -4,7 +4,14 @@ import "animate.css";
 import { Modal, Dropdown, Button } from "react-bootstrap";
 import Swal from "sweetalert2"; // Import SweetAlert2
 // import { getBeneficiaryDetails } from "../../framework/apiendpoint";
-import { IDENTITY_TYPES, initialFormData } from "../../constants";
+import {
+  IDENTITY_TYPES,
+  initialFormData,
+  MlcCaseList,
+  genderList,
+  stateMaster,
+  districtResponse,
+} from "../../constants";
 
 const GenerateTidModal = ({
   show,
@@ -25,83 +32,82 @@ const GenerateTidModal = ({
   const [skipContactDetail, setSkipContactDetail] = useState(false);
   const [skipMemberDetail, setSkipMemberDetail] = useState(false);
   const [errors, setErrors] = useState({});
+  const [filteredDistricts, setFilteredDistricts] = useState([]);
+  console.log("Filtered Districts:", filteredDistricts);
   const [beneficiaryData, setBeneficiaryData] = useState({
-    entitlementType: "APL",
-    rationCardNo: "RC1234567890",
-    mobileNo: 9876543210,
-    houseNo: "12B",
-    colonyStreet: "Shivaji Nagar, Main Road",
-    blockWard: "Ward 24",
-    gramPanchayat: "Gopalpura",
-    village: "Rampura",
-    tehsil: "Sanganer",
-    district: "Jaipur",
-    state: "Rajasthan",
-    pin: 302029,
-    bhamashaId: 100234567890,
-    janAadhaarId: 1234567890123,
+    mobileNo: "7728906789",
+    emailId: "Aa@gmail.com",
+    houseNo: "AB-111",
+    colonyStreet: "Near temple",
+    wardBlock: "C090",
+    village: "jodhpur",
+    gramPanchayat: "C090W005",
+    tehsil: "jodhpur",
+    policeStation: "shyam nagar",
+    districtCode: 2,
+    stateCode: 8,
+    pinCode: 341503,
+    hofMobileNo: "7728906789",
+    beneficiaryCategory: null,
+    janAadhaarId: "4735561159",
+    rationCardNo: "2345678901234",
+    abhaNo: null,
+    bhamashaAckNo: null,
     memberDetailsResp: [
       {
-        aadhaarNo: "567812349012",
-        abhaNo: "ABHA12345678",
-        nameHindi: "गोपाल लाल",
-        nameEnglish: "Gopal Lal",
+        janAadhaarId: null,
+        janAadhaarMemberId: "36546802974",
+        mobileNo: "7728906789",
+        nameHindi: "भागीरथ प्रजापत",
+        nameEnglish: "Bhagirath Prajapat",
+        age: 26,
+        dob: null,
         gender: "Male",
-        relation: "Head",
-        age: 45,
-        dob: "1980-06-12T00:00:00.000Z",
-        hhid: "HH123456",
-        category: "OBC",
-        isAadhaarVerified: 1,
-        verifyMethod: "OTP",
-        verifyStatus: 0,
-        aadhaarHitCount: 2,
-        fmrReqCount: 1,
-        assessmentYear: "2024-25",
+        relation: "Husband",
+        hhid: "91864755",
+        beneficiaryCategory: "INSTANT",
       },
       {
-        aadhaarNo: "901245678901",
-        abhaNo: "ABHA98765432",
-        nameHindi: "सीता देवी",
-        nameEnglish: "Sita Devi",
-        gender: "Female",
-        relation: "Spouse",
-        age: 42,
-        dob: "1983-11-04T00:00:00.000Z",
-        hhid: "HH123456",
-        category: "OBC",
-        isAadhaarVerified: 0,
-        verifyMethod: "Biometric",
-        verifyStatus: 0,
-        aadhaarHitCount: 3,
-        fmrReqCount: 0,
-        assessmentYear: "2024-25",
-      },
-      {
-        aadhaarNo: "678901234567",
-        abhaNo: "ABHA11223344",
-        nameHindi: "राजेश लाल",
-        nameEnglish: "Rajesh Lal",
+        janAadhaarId: null,
+        janAadhaarMemberId: "96757250782",
+        mobileNo: "7728906789",
+        nameHindi: "प्रवंश प्रजापत",
+        nameEnglish: "Pravansh Prajapat",
+        age: 27,
+        dob: null,
         gender: "Male",
         relation: "Son",
-        age: 18,
-        dob: "2007-02-15T00:00:00.000Z",
-        hhid: "HH123456",
-        category: "OBC",
-        isAadhaarVerified: 0,
-        verifyMethod: "None",
-        verifyStatus: 0,
-        aadhaarHitCount: 0,
-        fmrReqCount: 0,
-        assessmentYear: "2024-25",
+        hhid: "91864756",
+        beneficiaryCategory: "INSTANT",
+      },
+      {
+        janAadhaarId: null,
+        janAadhaarMemberId: "46149464714",
+        mobileNo: "7728906789",
+        nameHindi: "रक्षिता",
+        nameEnglish: "Rakshita",
+        age: 28,
+        dob: null,
+        gender: "Female",
+        relation: "Daughter",
+        hhid: "137382590",
+        beneficiaryCategory: "INSTANT",
       },
     ],
-    status: 1,
-    message: "Data fetched successfully",
   });
   const [formData, setFormData] = useState(initialFormData);
 
   const [selectedMemberIndex, setSelectedMemberIndex] = useState(null);
+
+  const getStateName = (code) => {
+    const state = stateMaster.find((s) => s.stateCode === code);
+    return state ? state.descriptionEnglish : "-";
+  };
+
+  const getDistrictName = (code) => {
+    const district = districtResponse.find((d) => d.districtCode === code);
+    return district ? district.descriptionEnglish : "-";
+  };
 
   const handleSingleMemberSelect = (index) => {
     if (selectedMemberIndex === index) {
@@ -114,7 +120,20 @@ const GenerateTidModal = ({
   console.log("Form Data:", formData);
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+    // When residenceState changes, filter districts
+    if (name === "residenceState") {
+      const filtered = districtResponse.filter(
+        (district) => district.stateCode === Number(value)
+      );
+      setFilteredDistricts(filtered);
+
+      // reset district when state changes
+      setFormData((prev) => ({ ...prev, residenceDistrict: "" }));
+    }
   };
 
   // Camera logic from your working example
@@ -252,21 +271,35 @@ const GenerateTidModal = ({
   useEffect(() => {
     if (formData.admissionType === "normal") {
       // For normal admission: skip step 2 only if no Jan Aadhaar
-      setSkipContactDetail(!formData.isJanAadhaarId);
+      setSkipContactDetail(!formData.isJanAadhaar);
       setSkipMemberDetail(false);
     } else if (formData.admissionType === "emergency") {
       // For emergency admission: skip both step 2 and step 3
       setSkipContactDetail(true);
       setSkipMemberDetail(true);
     }
-  }, [formData?.isJanAadhaarId, formData.admissionType]);
+  }, [formData?.isJanAadhaar, formData.admissionType]);
 
   // Single select handler for checkbox groups
-  const handleSingleSelect = (fieldName, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      [fieldName]: value,
-    }));
+  const handleSingleSelect = (field, value) => {
+    setFormData((prev) => {
+      let updatedForm = { ...prev, [field]: value };
+
+      // 🧠 1️⃣ If RTA = Yes → Admission Type = Emergency (force)
+      if (field === "isRta" && value === "yes") {
+        updatedForm.admissionType = "emergency";
+      }
+
+      // 🧠 2️⃣ If Admission Type = Normal → RTA must be No
+      if (field === "admissionType" && value === "normal") {
+        updatedForm.isRta = "no";
+      }
+
+      // 🧠 3️⃣ If RTA = No → user can choose Admission Type freely (no forced change)
+      // So no automatic update needed for this case.
+
+      return updatedForm;
+    });
   };
 
   const hasVerifiedMember = beneficiaryData?.memberDetailsResp?.some(
@@ -499,11 +532,11 @@ const GenerateTidModal = ({
                       <input
                         className="form-check-input single-select"
                         type="checkbox"
-                        name="isJanAadhaarId"
+                        name="isJanAadhaar"
                         id="jan-yes"
-                        checked={formData?.isJanAadhaarId === true}
+                        checked={formData?.isJanAadhaar === true}
                         onChange={() =>
-                          handleSingleSelect("isJanAadhaarId", true)
+                          handleSingleSelect("isJanAadhaar", true)
                         }
                       />
                       <label className="form-check-label" htmlFor="jan-yes">
@@ -514,11 +547,11 @@ const GenerateTidModal = ({
                       <input
                         className="form-check-input single-select"
                         type="checkbox"
-                        name="isJanAadhaarId"
+                        name="isJanAadhaar"
                         id="jan-no"
-                        checked={formData?.isJanAadhaarId === false}
+                        checked={formData?.isJanAadhaar === false}
                         onChange={() =>
-                          handleSingleSelect("isJanAadhaarId", false)
+                          handleSingleSelect("isJanAadhaar", false)
                         }
                       />
                       <label className="form-check-label" htmlFor="jan-no">
@@ -526,7 +559,7 @@ const GenerateTidModal = ({
                       </label>
                     </div>
                   </div>
-                  {!formData?.isJanAadhaarId && (
+                  {!formData?.isJanAadhaar && (
                     <div className="alert alert-info mt-2 small">
                       <i className="bi bi-info-circle"></i> Step 2 will be
                       skipped as you don't have Jan Aadhaar ID.
@@ -549,8 +582,8 @@ const GenerateTidModal = ({
                       <label className="form-label">Patient Name</label>
                       <input
                         type="text"
-                        name="patientNameEnglish"
-                        value={formData.patientNameEnglish}
+                        name="nameEnglish"
+                        value={formData.nameEnglish}
                         onChange={handleChange}
                         className="form-control"
                         placeholder="Enter patient name"
@@ -569,45 +602,19 @@ const GenerateTidModal = ({
                     </div>
                     <div className="col-md-3">
                       <label className="form-label">Gender</label>
-                      <div className="single-select-group">
-                        <div className="form-check">
-                          <input
-                            className="form-check-input single-select"
-                            type="checkbox"
-                            name="gender"
-                            id="gender-male"
-                            checked={formData.gender === "male"}
-                            onChange={() =>
-                              handleSingleSelect("gender", "male")
-                            }
-                          />
-                          <label
-                            className="form-check-label"
-                            htmlFor="gender-male"
-                          >
-                            Male
-                          </label>
-                        </div>
-                        <div className="form-check">
-                          <input
-                            className="form-check-input single-select"
-                            type="checkbox"
-                            name="gender"
-                            id="gender-female"
-                            value="female"
-                            checked={formData.gender === "female"}
-                            onChange={() =>
-                              handleSingleSelect("gender", "female")
-                            }
-                          />
-                          <label
-                            className="form-check-label"
-                            htmlFor="gender-female"
-                          >
-                            Female
-                          </label>
-                        </div>
-                      </div>
+                      <select
+                        className="form-select"
+                        name="genderId"
+                        value={formData.genderId}
+                        onChange={handleChange}
+                      >
+                        <option value="">Select Gender</option>
+                        {genderList.map((g) => (
+                          <option key={g.genderId} value={g.genderId}>
+                            {g.description}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   </div>
                 </div>
@@ -652,23 +659,28 @@ const GenerateTidModal = ({
 
                   {/* MLC Details - Conditionally Rendered */}
                   {formData.isMlcCase && (
-                    <div
-                      id="mlc-details"
-                      className="mlc-details bg-light rounded"
-                    >
-                      <div className="row">
-                        <div className="col-md-12 mb-2">
-                          <label className="form-label">
-                            Assault And Battery, Including Domestic Violence
-                          </label>
-                          <select className="form-select">
-                            <option>
-                              Assault And Battery, Including Domestic Violence
-                            </option>
-                            <option>Other</option>
-                          </select>
-                        </div>
-                      </div>
+                    <div className="col-md-12 mb-2">
+                      <label className="form-label">
+                        MLC Case Type <span className="text-danger">*</span>
+                      </label>
+                      <select
+                        className={`form-select ${
+                          errors.mlcCase ? "is-invalid" : ""
+                        }`}
+                        name="mlcCaseId"
+                        value={formData.mlcCaseId}
+                        onChange={handleChange}
+                      >
+                        <option value="">Select MLC Case</option>
+                        {MlcCaseList.map((item) => (
+                          <option key={item.mlcCaseId} value={item.mlcCaseId}>
+                            {item.description}
+                          </option>
+                        ))}
+                      </select>
+                      {errors.mlcCase && (
+                        <div className="invalid-feedback">{errors.mlcCase}</div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -732,9 +744,9 @@ const GenerateTidModal = ({
                           <input
                             type="text"
                             className="form-control"
-                            name="personNameIdentifyPatient"
+                            name="identifierName"
                             placeholder="Enter name"
-                            value={formData.personNameIdentifyPatient}
+                            value={formData.identifierName}
                             onChange={handleChange}
                           />
                         </div>
@@ -745,9 +757,9 @@ const GenerateTidModal = ({
                           <input
                             type="text"
                             className="form-control"
-                            name="relationshipWithPatient"
+                            name="identifierRelation"
                             placeholder="Enter relationship"
-                            value={formData.relationWithPatient}
+                            value={formData.identifierRelation}
                             onChange={handleChange}
                           />
                         </div>
@@ -755,10 +767,10 @@ const GenerateTidModal = ({
                           <label className="form-label">Contact No.</label>
                           <input
                             type="tel"
-                            name="personContactNo"
+                            name="identifierContactNo"
                             className="form-control"
                             placeholder="Enter contact number"
-                            value={formData.personContactNo}
+                            value={formData.identifierContactNo}
                             onChange={handleChange}
                           />
                         </div>
@@ -770,60 +782,52 @@ const GenerateTidModal = ({
             )}
 
             {/* Identity Details - Conditionally Shown */}
-            {formData?.isJanAadhaarId &&
-              formData.admissionType === "normal" && (
-                <div className="row">
-                  <div className="col-md-4 mb-2">
-                    <label className="form-label">
-                      Identity Type <span className="text-danger">*</span>
-                    </label>
-                    <select
-                      className={`form-select ${
-                        errors.identityType ? "is-invalid" : ""
-                      }`}
-                      name="identityType"
-                      value={formData.identityType}
-                      onChange={handleChange}
-                    >
-                      <option value="">Select Identity Type</option>
-                      {IDENTITY_TYPES.map((type) => (
-                        <option
-                          key={type.identityTypeId}
-                          value={type.identityTypeId}
-                        >
-                          {type.description}
-                        </option>
-                      ))}
-                    </select>
-                    {errors.identityType && (
-                      <div className="invalid-feedback">
-                        {errors.identityType}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="col-md-4 mb-2">
-                    <label className="form-label">
-                      Identity Number <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className={`form-control ${
-                        errors.identityNumber ? "is-invalid" : ""
-                      }`}
-                      name="identityNumber"
-                      value={formData.identityNumber}
-                      onChange={handleChange}
-                      placeholder="Enter Identity Number"
-                    />
-                    {errors.identityNumber && (
-                      <div className="invalid-feedback">
-                        {errors.identityNumber}
-                      </div>
-                    )}
-                  </div>
+            {formData?.isJanAadhaar && formData.admissionType === "normal" && (
+              <div className="row">
+                <div className="col-md-4 mb-2">
+                  <label className="form-label">
+                    Identity Type <span className="text-danger">*</span>
+                  </label>
+                  <select
+                    className={`form-select`}
+                    name="identityType"
+                    value={formData.identityType}
+                    onChange={handleChange}
+                  >
+                    <option value="">Select Identity Type</option>
+                    {IDENTITY_TYPES.map((type) => (
+                      <option
+                        key={type.identityTypeId}
+                        value={type.identityTypeId}
+                      >
+                        {type.description}
+                      </option>
+                    ))}
+                  </select>
                 </div>
-              )}
+
+                <div className="col-md-4 mb-2">
+                  <label className="form-label">
+                    Identity Number <span className="text-danger">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    className={`form-control ${
+                      errors.identityNumber ? "is-invalid" : ""
+                    }`}
+                    name="identityNumber"
+                    value={formData.identityNumber}
+                    onChange={handleChange}
+                    placeholder="Enter Identity Number"
+                  />
+                  {errors.identityNumber && (
+                    <div className="invalid-feedback">
+                      {errors.identityNumber}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -858,7 +862,7 @@ const GenerateTidModal = ({
                 </div>
               </div>
               <div className="col-md-4 mb-2">
-                <label className="form-label">Colony/Street</label>
+                <label className="form-label">Colony/colonyStreet</label>
                 <div className="form-control bg-light">
                   {beneficiaryData?.colonyStreet || "-"}
                 </div>
@@ -866,7 +870,7 @@ const GenerateTidModal = ({
               <div className="col-md-4 mb-2">
                 <label className="form-label">Block/Ward</label>
                 <div className="form-control bg-light">
-                  {beneficiaryData?.blockWard || "-"}
+                  {beneficiaryData?.wardBlock || "-"}
                 </div>
               </div>
             </div>
@@ -891,22 +895,23 @@ const GenerateTidModal = ({
               </div>
             </div>
             <div className="row">
-              <div className="col-md-4 ">
+              <div className="col-md-4">
                 <label className="form-label">District</label>
                 <div className="form-control bg-light">
-                  {beneficiaryData?.district || "-"}
+                  {getDistrictName(beneficiaryData?.districtCode)}
                 </div>
               </div>
-              <div className="col-md-4 ">
+
+              <div className="col-md-4">
                 <label className="form-label">State</label>
                 <div className="form-control bg-light">
-                  {beneficiaryData?.state || "-"}
+                  {getStateName(beneficiaryData?.stateCode)}
                 </div>
               </div>
               <div className="col-md-4 ">
                 <label className="form-label">Pincode</label>
                 <div className="form-control bg-light">
-                  {beneficiaryData?.pin || "-"}
+                  {beneficiaryData?.pinCode || "-"}
                 </div>
               </div>
             </div>
@@ -929,7 +934,7 @@ const GenerateTidModal = ({
 
         {currentStep === 3 && (
           <div className="tab-pane fade show active">
-            {formData?.isJanAadhaarId && (
+            {formData?.isJanAadhaar && (
               <>
                 <h4 className="step-heading">Member Details of Beneficiary</h4>
                 {/* Verify By Field */}
@@ -1075,7 +1080,7 @@ const GenerateTidModal = ({
                               <td>{member.nameHindi}</td>
                               <td>{member.gender}</td>
                               <td>{member.age}</td>
-                              <td>{member.category}</td>
+                              <td>{member.beneficiaryCategory}</td>
                               <td>{member.aadhaarNo}</td>
                               <td>
                                 {isVerified ? (
@@ -1111,7 +1116,7 @@ const GenerateTidModal = ({
                                         Create ABHA
                                       </Dropdown.Item>
                                       <Dropdown.Item href="#">
-                                        <i className="bi bi-arrow-repeat" />{" "}
+                                        <i className="bi bi-arrow-repeat" />
                                         Verified/Update ABHA
                                       </Dropdown.Item>
                                     </Dropdown.Menu>
@@ -1129,343 +1134,283 @@ const GenerateTidModal = ({
             )}
 
             {/* Instant Beneficiary Form - Conditionally Rendered */}
-            {!formData?.isJanAadhaarId &&
-              formData.admissionType === "normal" && (
-                <div id="instant-beneficiary-form">
-                  <h5 className="step-heading">Instant Beneficiary Details</h5>
+            {!formData?.isJanAadhaar && formData.admissionType === "normal" && (
+              <div id="instant-beneficiary-form">
+                <h5 className="step-heading">Instant Beneficiary Details</h5>
 
-                  <div className="row">
-                    <div className="col-md-4 mb-2">
-                      <label className="form-label">
-                        Patient Name <span className="text-danger">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        name="patientNameEnglish"
-                        className="form-control"
-                        placeholder="Enter patient name"
-                        value={formData.patientNameEnglish}
-                        onChange={handleChange}
-                      />
-                    </div>
-
-                    <div className="col-md-4 mb-2">
-                      <label className="form-label">Age</label>
-                      <input
-                        type="number"
-                        name="age"
-                        className="form-control"
-                        placeholder="Age"
-                        value={formData.age}
-                        onChange={handleChange}
-                      />
-                    </div>
-
-                    <div className="col-md-4 mb-2">
-                      <label className="form-label">
-                        Gender <span className="text-danger">*</span>
-                      </label>
-                      <div className="single-select-group">
-                        <div className="form-check">
-                          <input
-                            className="form-check-input single-select"
-                            type="checkbox"
-                            name="gender"
-                            id="instant-gender-male"
-                            checked={formData.gender === "male"}
-                            onChange={() =>
-                              handleSingleSelect("gender", "male")
-                            }
-                          />
-                          <label
-                            className="form-check-label"
-                            htmlFor="instant-gender-male"
-                          >
-                            Male
-                          </label>
-                        </div>
-                        <div className="form-check">
-                          <input
-                            className="form-check-input single-select"
-                            type="checkbox"
-                            name="gender"
-                            id="instant-gender-female"
-                            checked={formData.gender === "female"}
-                            onChange={() =>
-                              handleSingleSelect("gender", "female")
-                            }
-                          />
-                          <label
-                            className="form-check-label"
-                            htmlFor="instant-gender-female"
-                          >
-                            Female
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="col-md-4 mb-2">
-                      <label className="form-label">Mobile No</label>
-                      <input
-                        type="tel"
-                        name="mobileNo"
-                        className="form-control"
-                        placeholder="Enter mobile number"
-                        value={formData.mobileNo}
-                        onChange={handleChange}
-                      />
-                    </div>
-
-                    <div className="col-md-4 mb-2">
-                      <label className="form-label">House No</label>
-                      <input
-                        type="text"
-                        name="houseNo"
-                        className="form-control"
-                        placeholder="Enter house number"
-                        value={formData.houseNo}
-                        onChange={handleChange}
-                      />
-                    </div>
-
-                    <div className="col-md-4 mb-2">
-                      <label className="form-label">Colony/Street</label>
-                      <input
-                        type="text"
-                        name="colonyStreet"
-                        className="form-control"
-                        placeholder="Enter colony/street"
-                        value={formData.colonyStreet}
-                        onChange={handleChange}
-                      />
-                    </div>
-
-                    <div className="col-md-4 mb-2">
-                      <label className="form-label">Block/Ward</label>
-                      <input
-                        type="text"
-                        name="blockWard"
-                        className="form-control"
-                        placeholder="Enter block/ward"
-                        value={formData.blockWard}
-                        onChange={handleChange}
-                      />
-                    </div>
-
-                    <div className="col-md-4 mb-2">
-                      <label className="form-label">Village</label>
-                      <input
-                        type="text"
-                        name="village"
-                        className="form-control"
-                        placeholder="Enter village"
-                        value={formData.village}
-                        onChange={handleChange}
-                      />
-                    </div>
-
-                    <div className="col-md-4 mb-2">
-                      <label className="form-label">Tehsil</label>
-                      <input
-                        type="text"
-                        name="tehsil"
-                        className="form-control"
-                        placeholder="Enter tehsil"
-                        value={formData.tehsil}
-                        onChange={handleChange}
-                      />
-                    </div>
-
-                    <div className="col-md-6 mb-2">
-                      <label className="form-label">
-                        Incident District <span className="text-danger">*</span>
-                      </label>
-                      <select className="form-select">
-                        <option value="">- Select -</option>
-                        <option value="district1">District 1</option>
-                        <option value="district2">District 2</option>
-                        <option value="district3">District 3</option>
-                      </select>
-                    </div>
-
-                    <div className="col-md-6 mb-2">
-                      <label className="form-label">Pin Code</label>
-                      <input
-                        type="text"
-                        name="pinCode"
-                        className="form-control"
-                        placeholder="Enter pin code"
-                        value={formData.pinCode}
-                        onChange={handleChange}
-                      />
-                    </div>
-
-                    <div className="col-md-6 mb-2">
-                      <label className="form-label">
-                        Residence State <span className="text-danger">*</span>
-                      </label>
-                      <select
-                        className="form-select"
-                        name="residenceState"
-                        onChange={handleChange}
-                        value={formData.residenceState}
-                      >
-                        <option value="">- Select -</option>
-                        <option value="state1">State 1</option>
-                        <option value="state2">State 2</option>
-                        <option value="state3">State 3</option>
-                      </select>
-                    </div>
-
-                    <div className="col-md-6 mb-2">
-                      <label className="form-label">
-                        Residence District
-                        <span className="text-danger">*</span>
-                      </label>
-                      <select
-                        className="form-select"
-                        name="residenceDistrict"
-                        onChange={handleChange}
-                        value={formData.residenceDistrict}
-                      >
-                        <option value="">- Select -</option>
-                        <option value="district1">District 1</option>
-                        <option value="district2">District 2</option>
-                        <option value="district3">District 3</option>
-                      </select>
-                    </div>
+                <div className="row">
+                  <div className="col-md-4 mb-2">
+                    <label className="form-label">
+                      Patient Name <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="nameEnglish"
+                      className="form-control"
+                      placeholder="Enter patient name"
+                      value={formData.nameEnglish}
+                      onChange={handleChange}
+                    />
                   </div>
 
-                  {/* Verification Section */}
-                  <div className="row">
-                    <div className="col-md-6">
-                      <label className="form-label">Verification By</label>
-                      <div className="single-select-group">
-                        <div className="form-check">
-                          <input
-                            className="form-check-input single-select"
-                            type="checkbox"
-                            name="verifyMethod"
-                            id="verification-aadhaar"
-                            checked={formData.verifyMethod === "aadhaar"}
-                            onChange={() =>
-                              handleSingleSelect("verifyMethod", "aadhaar")
-                            }
-                          />
-                          <label
-                            className="form-check-label"
-                            htmlFor="verification-aadhaar"
-                          >
-                            Aadhaar
-                          </label>
-                        </div>
-                        <div className="form-check">
-                          <input
-                            className="form-check-input single-select"
-                            type="checkbox"
-                            name="verifyMethod"
-                            id="verification-moic"
-                            checked={formData.verifyMethod === "moic"}
-                            onChange={() =>
-                              handleSingleSelect("verifyMethod", "moic")
-                            }
-                          />
-                          <label
-                            className="form-check-label"
-                            htmlFor="verification-moic"
-                          >
-                            Medical Officer In Charge (MOIC)
-                          </label>
-                        </div>
+                  <div className="col-md-4 mb-2">
+                    <label className="form-label">Age</label>
+                    <input
+                      type="number"
+                      name="age"
+                      className="form-control"
+                      placeholder="Age"
+                      value={formData.age}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  <div className="col-md-4 mb-2">
+                    <label className="form-label">Gender</label>
+                    <select
+                      className="form-select"
+                      name="genderId"
+                      value={formData.genderId}
+                      onChange={handleChange}
+                    >
+                      <option value="">Select Gender</option>
+                      {genderList.map((g) => (
+                        <option key={g.genderId} value={g.genderId}>
+                          {g.description}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="col-md-4 mb-2">
+                    <label className="form-label">Mobile No</label>
+                    <input
+                      type="tel"
+                      name="mobileNo"
+                      className="form-control"
+                      placeholder="Enter mobile number"
+                      value={formData.mobileNo}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  <div className="col-md-4 mb-2">
+                    <label className="form-label">House No</label>
+                    <input
+                      type="text"
+                      name="houseNo"
+                      className="form-control"
+                      placeholder="Enter house number"
+                      value={formData.houseNo}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  <div className="col-md-4 mb-2">
+                    <label className="form-label">Colony/colonyStreet</label>
+                    <input
+                      type="text"
+                      name="colonyStreet"
+                      className="form-control"
+                      placeholder="Enter colony/colonyStreet"
+                      value={formData.colonyStreet}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  <div className="col-md-4 mb-2">
+                    <label className="form-label">Block/Ward</label>
+                    <input
+                      type="text"
+                      name="wardBlock"
+                      className="form-control"
+                      placeholder="Enter block/ward"
+                      value={formData.wardBlock}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  <div className="col-md-4 mb-2">
+                    <label className="form-label">Village</label>
+                    <input
+                      type="text"
+                      name="village"
+                      className="form-control"
+                      placeholder="Enter village"
+                      value={formData.village}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  <div className="col-md-4 mb-2">
+                    <label className="form-label">Tehsil</label>
+                    <input
+                      type="text"
+                      name="tehsil"
+                      className="form-control"
+                      placeholder="Enter tehsil"
+                      value={formData.tehsil}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  <div className="col-md-6 mb-2">
+                    <label className="form-label">
+                      Incident District <span className="text-danger">*</span>
+                    </label>
+                    <select className="form-select">
+                      <option value="">- Select -</option>
+                      <option value="district1">District 1</option>
+                      <option value="district2">District 2</option>
+                      <option value="district3">District 3</option>
+                    </select>
+                  </div>
+
+                  <div className="col-md-6 mb-2">
+                    <label className="form-label">Pin Code</label>
+                    <input
+                      type="text"
+                      name="pinCode"
+                      className="form-control"
+                      placeholder="Enter pin code"
+                      value={formData.pinCode}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  <div className="col-md-6 mb-2">
+                    <label className="form-label">
+                      Residence State <span className="text-danger">*</span>
+                    </label>
+                    <select
+                      className="form-select"
+                      name="residenceState"
+                      value={formData.residenceState}
+                      onChange={handleChange}
+                    >
+                      <option value="">Select Residence State</option>
+                      {stateMaster.map((state) => (
+                        <option key={state.stateCode} value={state.stateCode}>
+                          {state.descriptionEnglish}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="col-md-6 mb-2">
+                    <label className="form-label">
+                      Residence District <span className="text-danger">*</span>
+                    </label>
+                    <select
+                      className="form-select"
+                      name="residenceDistrict"
+                      value={formData.residenceDistrict}
+                      onChange={handleChange}
+                      disabled={!formData.residenceState} // ✅ disable when no state selected
+                    >
+                      <option value="">Select Residence District</option>
+                      {filteredDistricts.map((district) => (
+                        <option
+                          key={district.districtCode}
+                          value={district.districtCode}
+                        >
+                          {district.descriptionEnglish}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Verification Section */}
+                <div className="row">
+                  <div className="col-md-6">
+                    <label className="form-label">Verification By</label>
+                    <div className="single-select-group">
+                      <div className="form-check">
+                        <input
+                          className="form-check-input single-select"
+                          type="checkbox"
+                          name="verifyMethod"
+                          id="verification-aadhaar"
+                          checked={formData.verifyMethod === "aadhaar"}
+                          onChange={() =>
+                            handleSingleSelect("verifyMethod", "aadhaar")
+                          }
+                        />
+                        <label
+                          className="form-check-label"
+                          htmlFor="verification-aadhaar"
+                        >
+                          Aadhaar
+                        </label>
+                      </div>
+                      <div className="form-check">
+                        <input
+                          className="form-check-input single-select"
+                          type="checkbox"
+                          name="verifyMethod"
+                          id="verification-moic"
+                          checked={formData.verifyMethod === "moic"}
+                          onChange={() =>
+                            handleSingleSelect("verifyMethod", "moic")
+                          }
+                        />
+                        <label
+                          className="form-check-label"
+                          htmlFor="verification-moic"
+                        >
+                          Medical Officer In Charge (MOIC)
+                        </label>
                       </div>
                     </div>
                   </div>
+                </div>
 
-                  {/* Aadhaar Case Conditionally Rendered */}
-                  {formData.verifyMethod === "aadhaar" && (
-                    <div
-                      id="moic-doc-upload"
-                      className="moic-doc-upload m-0 p-3 border rounded "
-                    >
-                      <div className="row">
-                        <div className="col-md-12 mb-2">
-                          <label className="form-label">Aadhaar No</label>
-                          <div className="d-flex align-items-center">
-                            <input
-                              type="text"
-                              className="form-control me-2"
-                              placeholder="Aadhaar number"
-                            />
-                            <label
-                              className="form-check-label small"
-                              htmlFor="aadhaar-not-verified"
-                            >
-                              Not Verified
-                            </label>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  {/* MOIC Document Upload Field - Conditionally Rendered */}
-                  {formData.verifyMethod === "moic" && (
-                    <div
-                      id="moic-doc-upload"
-                      className="moic-doc-upload mt-3 p-3 border rounded "
-                    >
-                      <div className="row">
-                        <div className="col-md-10">
-                          <label className="form-label">
-                            Upload MOIC Approved Document{" "}
-                            <span className="text-danger">*</span>
-                          </label>
+                {/* Aadhaar Case Conditionally Rendered */}
+                {formData.verifyMethod === "aadhaar" && (
+                  <div
+                    id="moic-doc-upload"
+                    className="moic-doc-upload m-0 p-3 border rounded "
+                  >
+                    <div className="row">
+                      <div className="col-md-12 mb-2">
+                        <label className="form-label">Aadhaar No</label>
+                        <div className="d-flex align-items-center">
                           <input
-                            type="file"
-                            className="form-control"
-                            accept=".pdf,.jpg,.jpeg,.png"
+                            type="text"
+                            className="form-control me-2"
+                            placeholder="Aadhaar number"
                           />
-                          <small className="text-muted">
-                            Accepted formats: PDF, JPG, JPEG, PNG
-                          </small>
-                        </div>
-                        <div className="col-md-2">
-                          <label className="form-label d-block">&nbsp;</label>
-                          <button className="btn btn-success btn-sm me-2">
-                            Upload
-                          </button>
-                          <button className="btn btn-secondary btn-sm">
-                            Cancel
-                          </button>
+                          <label
+                            className="form-check-label small"
+                            htmlFor="aadhaar-not-verified"
+                          >
+                            Not Verified
+                          </label>
                         </div>
                       </div>
                     </div>
-                  )}
-
-                  {/* Instant Approval Document Section */}
-                  <div className="instant-approval-section mt-3 p-3 border rounded bg-light">
-                    <h5 className="mb-3">Instant Approval Document</h5>
-                    <p className="small text-muted mb-3">
-                      Citizen is not enrolled with MAA Yojana. In case of
-                      Emergency, an approval request form document can be
-                      uploaded and after approval from concerned District
-                      Collector or Govt. Hospitality and Medical Department (in
-                      case of Govt. hospital), citizen can avail benefits.
-                    </p>
-
-                    <div className="row mb-3">
+                  </div>
+                )}
+                {/* MOIC Document Upload Field - Conditionally Rendered */}
+                {formData.verifyMethod === "moic" && (
+                  <div
+                    id="moic-doc-upload"
+                    className="moic-doc-upload mt-3 p-3 border rounded "
+                  >
+                    <div className="row">
                       <div className="col-md-10">
                         <label className="form-label">
-                          Upload Approval Document (Only PDF file, not more than
-                          500 KB, is allowed)
+                          Upload MOIC Approved Document{" "}
+                          <span className="text-danger">*</span>
                         </label>
                         <input
                           type="file"
                           className="form-control"
-                          accept=".pdf"
+                          accept=".pdf,.jpg,.jpeg,.png"
                         />
                         <small className="text-muted">
-                          Maximum file size: 500 KB
+                          Accepted formats: PDF, JPG, JPEG, PNG
                         </small>
                       </div>
                       <div className="col-md-2">
@@ -1479,8 +1424,47 @@ const GenerateTidModal = ({
                       </div>
                     </div>
                   </div>
+                )}
+
+                {/* Instant Approval Document Section */}
+                <div className="instant-approval-section mt-3 p-3 border rounded bg-light">
+                  <h5 className="mb-3">Instant Approval Document</h5>
+                  <p className="small text-muted mb-3">
+                    Citizen is not enrolled with MAA Yojana. In case of
+                    Emergency, an approval request form document can be uploaded
+                    and after approval from concerned District Collector or
+                    Govt. Hospitality and Medical Department (in case of Govt.
+                    hospital), citizen can avail benefits.
+                  </p>
+
+                  <div className="row mb-3">
+                    <div className="col-md-10">
+                      <label className="form-label">
+                        Upload Approval Document (Only PDF file, not more than
+                        500 KB, is allowed)
+                      </label>
+                      <input
+                        type="file"
+                        className="form-control"
+                        accept=".pdf"
+                      />
+                      <small className="text-muted">
+                        Maximum file size: 500 KB
+                      </small>
+                    </div>
+                    <div className="col-md-2">
+                      <label className="form-label d-block">&nbsp;</label>
+                      <button className="btn btn-success btn-sm me-2">
+                        Upload
+                      </button>
+                      <button className="btn btn-secondary btn-sm">
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              )}
+              </div>
+            )}
           </div>
         )}
 
